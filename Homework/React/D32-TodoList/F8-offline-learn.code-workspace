@@ -1,0 +1,13 @@
+{
+  "folders": [
+	{
+		"path": "../../../../../F8-offline-learn"
+	},
+	{
+		"path": "../../../.."
+	}
+],
+  "settings": {
+    "liveServer.settings.multiRootWorkspaceName": "k15-demo"
+  }
+}

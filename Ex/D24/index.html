@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      body {
+        @apply h-screen
+      }
+    </style>
+</head>
+<body>
+    <div class="h-full bg-[#8758ff] flex items-center">
+        <div class="todo-list w-[450px] x-[300px] bg-[#1a1a40] p-10 mx-auto rounded-md">
+            <h1 class="text-3xl text-[#fff] mb-5 flex justify-center">Get Things Done !</h1>
+            <div class="flex">
+                <input 
+                class="
+                enter-input
+                outline-none
+                border
+                border-[#8758ff]
+                w-full
+                px-3
+                py-2
+                placeholder-gray-500
+                text-sm
+                text-white"
+                type="text"
+                placeholder="What is the task today?">
+                <button
+                class="
+                add-task
+                bg-[#8758ff]
+                w-25
+                text-sm
+                text-white"
+                 type="submit">
+                 Add Task
+                </button>
+            </div>
+            <div class="task mt-5 space-y-3"></div>
+        </div>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

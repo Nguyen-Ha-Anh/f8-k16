@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .container {
+        position: relative;
+        margin: 10px;
+        padding: 20px 30px;
+        border: 1px solid red;
+    }
+
+    .items {
+        margin-bottom: 30px;
+    }
+
+    .up {
+        color: green;
+    }
+
+    .down {
+        color: red;
+    }
+
+    .context-menu {
+        position: absolute;
+        background-color: #aaa;
+        width: 80px;
+        display: none;
+        z-index: 999;
+        padding: 5px 0;
+    }
+
+    .context-menu div {
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    .context-menu div:hover {
+        color: red;
+    }
+</style>
+<body>
+    <div class="container">
+        <div class="items">
+            <span>Item 1</span>
+            <a class="up">Up</a>
+            <a class="down">Down</a>
+        </div>
+        <div class="items">
+            <span>Item 2</span>
+            <a class="up">Up</a>
+            <a class="down">Down</a>
+        </div>
+        <div class="items">
+            <span>Item 3</span>
+            <a class="up">Up</a>
+            <a class="down">Down</a>
+        </div>
+        <div class="items">
+            <span>Item 4</span>
+            <a class="up">Up</a>
+            <a class="down">Down</a>
+        </div>
+        <div>
+            <span>Item 5</span>
+            <a class="up">Up</a>
+            <a class="down">Down</a>
+        </div>
+    </div>
+
+    <div class="context-menu">
+        <div class="renameBtn">Rename</div>
+        <div class="deleteBtn">Delete</div>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>
