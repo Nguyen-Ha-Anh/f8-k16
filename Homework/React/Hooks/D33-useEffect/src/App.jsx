@@ -21,15 +21,22 @@ function App() {
   const [debounced, setDebounced] = useState("");
 
   //order
-  const [limit] = useState(10);
+  const [limit] = useState(30);
   const [order, setOrder] = useState("desc");
   const [total, setTotal] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0)
 
+  console.log(total);
+  
+
+  // check zalo mình với
   //call API
   useEffect(() => {
     setLoadingList(true);
 
-    fetch("https://dummyjson.com/posts")
+    // const skip = (indexNum - 1) * limit
+
+    fetch(`https://dummyjson.com/posts?limit=${limit}&skip=${currentPage}&sortBy=id&order=${order}`) // ở đoạn này bạn thêm sortby và order vô đây là được
       .then((res) => res.json())
       .then((data) => {
         setPosts(data.posts);
@@ -38,7 +45,7 @@ function App() {
       .finally(() => {
         setLoadingList(false);
       });
-  }, []);
+  }, [currentPage, order]);
 
   // Debounce search
   useEffect(() => {
@@ -59,7 +66,7 @@ function App() {
       );
     }
 
-    result.sort((a, b) => (order === "desc" ? b.id - a.id : a.id - b.id));
+    // result.sort((a, b) => (order === "desc" ? b.id - a.id : a.id - b.id));
 
     // const sorted = [...posts].sort((a, b) => {
     //   if (order === 'desc') {
@@ -70,18 +77,27 @@ function App() {
     // })
     setDisplayPost(result);
     setIndexNum("1");
-  }, [order, debounced, posts]);
+  }, [debounced, posts]);
 
   //pagination logic
-  const start = (indexNum - 1) * limit;
-  const end = start + limit;
-  const paginatedPosts = displayPost.slice(start, end);
+  // này là bạn xử lý logic ở bên frontend hết rồi thực ra bạn chỉ cần call api và bên BE nó sẽ tự xử lý mấy cái này
+  //  const start = (indexNum - 1) * limit;
+  //const end = start + limit;
+  //const paginatedPosts = displayPost.slice(start, end);
 
-  const totalPages = Math.ceil(displayPost.length / limit);
+  const totalPages = Math.ceil(total / limit);
 
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+  //const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+
+ 
+  const handleChangePage =  (page) => {
+    setCurrentPage(page - 1)
+    
+  }
 
 
+  if(loadingList) return <span>đang tải...</span>
+  
 
   return (
     <div>
@@ -117,7 +133,7 @@ function App() {
               }
               onClick={() => {
                 setType(tab);
-                setIndexNum("1"); // reset page
+                setIndexNum(0); // reset page
                 setOrder(tab === "Newest" ? "desc" : "asc");
               }}
               className="border py-2 px-3 cursor-pointer hover:bg-yellow-200 border-gray-400"
@@ -129,7 +145,7 @@ function App() {
         <div>
           {/* {loading && <p>Loading..</p>} */}
 
-          {paginatedPosts.map((post) => (
+          {displayPost.map((post) => (
             <div key={post.id} className="border border-gray-400 p-3 mb-3">
               <h2 className="text-2xl font-medium mb-3">{post.title}</h2>
               <p>{post.body}</p>
@@ -166,21 +182,23 @@ function App() {
           ))}
         </div>
         <div className="flex gap-2">
-          {pages.map((page) => (
+          {[...Array(totalPages)].map((_, i) => (
             <button
-              key={page}
+              key={i}
               style={
-                indexNum === page
+                i === currentPage
                   ? {
                       color: "#fff",
                       backgroundColor: "green",
                     }
                   : {}
               }
-              onClick={() => setIndexNum(page)}
+              onClick={() =>{
+                 handleChangePage(i+1)
+              }}
               className="border border-gray-400 block py-2 px-4"
             >
-              {page}
+              {i + 1}
             </button>
           ))}
         </div>
@@ -210,3 +228,13 @@ function App() {
 }
 
 export default App;
+
+
+// chỗ mình bôi đen nhé 
+// fetch('https://dummyjson.com/posts?sortBy=title&order=asc')
+
+// bạn thấy nó gọi đến posts và sortBy theo title. Thì ở đây bạn thay bằng id giúp mình. Id q tượng trưng cho cái cũ nhất. ID lowns nhất là cũ nhất.
+// còn cái từ khoá order thì bạn truyền vào asc hoặc desc. asc là lấy ra nhỏ dần, desc là id tăng dần
+// thì ở trên lúc call api bạn tạo cho mình 1 thằng state là order mặc định là asc. khi click vào cũ nhất thì xét lại state thành desc
+// đó bạn thấy api nó trả về khác đúng không
+// ở trên mình nhầm nhé asc là id tăng dần, desc là giảm dần. tức là asc là bài viết cũ nhất, desc là bài viết mới nhất
