@@ -7,6 +7,7 @@ import CategorySection from "./ui/Category/CategorySection";
 import PopularRes from "./ui/Restaurants/PopularRes";
 import Download from "./ui/Download/Download";
 import PartnerSection from "./ui/Partner/PartnerSection";
+import AboutUs from "./ui/AboutUs/AboutUS";
 
 
 export default function App() {
@@ -20,6 +21,7 @@ export default function App() {
       <PopularRes/>
       <Download/>
       <PartnerSection/>
+      <AboutUs/>
     </div>
   );
 }

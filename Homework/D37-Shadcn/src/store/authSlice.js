@@ -28,15 +28,20 @@ export const login = createAsyncThunk(
 const authSlice = createSlice({
   name: "auth",
   initialState: {
+    //localStorage chi luu string --> can convert lai thanh object
+    //lay du lieu user da luu truoc do || neu chua tung login --> null
     user: JSON.parse(localStorage.getItem("user")) || null,
     tokens: JSON.parse(localStorage.getItem("tokens")) || null,
     loading: false,
     error: null,
   },
   reducers: {
+    //logout chi can reset state
     logout(state) {
+      //xoa thong tin nguoi dung khoi Redux store
       state.user = null;
       state.tokens = null;
+      //neu khong xoa ca localStorage se bi reload page, user login lai
       localStorage.removeItem('user');
       localStorage.removeItem('tokens');
     },
