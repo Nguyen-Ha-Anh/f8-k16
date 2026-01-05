@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 
 export default function PartnerCard({ badge, subtitle, title, image }) {
   return (
-    <div className="relative h-[420px] rounded-[32px] font-poppins overflow-hidden">
+    <div className="relative h-[420px] rounded-lg font-poppins overflow-hidden">
       <img
         src={image}
         alt={title}
