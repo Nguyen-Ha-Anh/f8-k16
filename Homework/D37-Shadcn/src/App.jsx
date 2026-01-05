@@ -6,7 +6,8 @@ import RegisterForm from "./ui/Form/RegisterForm";
 import CategorySection from "./ui/Category/CategorySection";
 import PopularRes from "./ui/Restaurants/PopularRes";
 import Download from "./ui/Download/Download";
-import Signup from "./ui/SignupPartner/Signup";
+import PartnerSection from "./ui/Partner/PartnerSection";
+
 
 export default function App() {
   return (
@@ -18,7 +19,7 @@ export default function App() {
       <CategorySection/>
       <PopularRes/>
       <Download/>
-      <Signup/>
+      <PartnerSection/>
     </div>
   );
 }
