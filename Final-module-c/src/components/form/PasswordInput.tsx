@@ -31,8 +31,8 @@ export default function PasswordInput<T extends FieldValues>({
           required: true,
           minLength: 8
         })}
-        className="peer h-[40px] w-full bg-[#25292E] border border-[#363636]
-        text-white text-sm px-3 pt-5 rounded-sm
+        className="peer h-[40px] w-full bg-background border border-[#363636]
+        text-foreground text-sm px-3 pt-5 rounded-sm
         focus:outline-none
         placeholder-transparent mb-1"
       />
@@ -55,7 +55,7 @@ export default function PasswordInput<T extends FieldValues>({
           type="button"
           onClick={() => setShow(!show)}
           className="absolute right-3 top-1/2 -translate-y-1/2
-        text-sm text-[#4db5f9] font-semibold"
+        text-sm text-foreground font-semibold"
         >
           {show ? "Hide" : "Show"}
         </button>

@@ -25,7 +25,7 @@ export default function RegisterForm() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="min-h-screen w-full flex items-center justify-center bg-[#0C1014]"
+      className="min-h-screen w-full flex items-center justify-center bg-background text-foreground"
     >
       <div className="w-[350px]">
         <div className="border border-[#262626] bg-[#0C1014] px-10 py-8 text-center">

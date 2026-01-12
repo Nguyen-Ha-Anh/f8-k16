@@ -26,7 +26,7 @@ export default function LoginForm() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="min-h-screen w-full bg-[#0C1014] flex items-center justify-center"
+      className="min-h-screen w-full bg-background text-foreground flex items-center justify-center"
     >
       <div className="w-full flex max-w-[935px]">
         {/* left */}
@@ -43,7 +43,7 @@ export default function LoginForm() {
           <div className="w-[300px]">
             <h1
               style={{ fontFamily: "Lobster, cursive" }}
-              className="font-instagram text-white text-[48px] text-center mb-8"
+              className="font-instagram bg-background text-foreground text-[48px] text-center mb-8"
             >
               Instagram
             </h1>
@@ -57,7 +57,7 @@ export default function LoginForm() {
                 {...register("identifier", {
                   required: true,
                 })}
-                className="peer h-[40px] w-full bg-[#25292E] border border-[#363636]
+                className="peer h-[40px] w-full bg-background text-foreground border border-[#363636]
               text-white text-sm px-3 pt-6 pb-2 rounded-sm 
              focus:outline-none <mb-1></mb-1>
               placeholder-transparent"
@@ -93,8 +93,8 @@ export default function LoginForm() {
 
             {/* or */}
             <div className="flex items-center my-5">
-              <div className="flex-1 h-px bg-[#262626]" />
-              <span className="mx-4 text-xs font-semibold text-[#a8a8a8]">
+              <div className="flex-1 h-px bg-background text-foreground " />
+              <span className="mx-4 text-xs font-semibold text-foreground">
                 OR
               </span>
               <div className="flex-1 h-px bg-[#262626]" />

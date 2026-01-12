@@ -1,38 +1,46 @@
-import type { SidebarItemProps } from "@/types/FeedType";
+import SidebarMenu from "./SidebarMenu";
 import { NavLink } from "react-router-dom";
+import type { SidebarItemProps } from "@/types/FeedType";
+import { useSidebar } from "@/context/SidebarContext";
 
-export default function SidebarItem({
-  label,
-  path,
-  icon: Icon,
-}: SidebarItemProps) {
+export default function SidebarItem(props: SidebarItemProps) {
+  const { toggleSearch, collapsed } = useSidebar();
 
-  const content = (
-    <div className="flex items-center gap-4 p-2 rounded-lg transition hover:bg-[#1a1a1a]">
-      {Icon && <Icon size={24} />}
-      <span className="">{label}</span>
-    </div>
-  );
-
-  if (path) {
+  if (props.type === "action") {
+    const Icon = props.icon;
     return (
-      <NavLink
-        to={path}
-        className={({ isActive }) =>
-          `flex items-center gap-4 p-2 rounded-lg transition
-         ${isActive ? "bg-[#1a1a1a] font-semibold" : ""}`
-        }
+      <button
+        onClick={toggleSearch}
+        className="flex items-center gap-4 p-2 rounded-lg transition w-full"
       >
-        {({ isActive }) => (
-          <>
-            {Icon && (
-              <Icon size={24} active={isActive ? "text-white" : "text-black"} />
-            )}
-            <span className={isActive ? "font-semibold" : ""}>{label}</span>
-          </>
-        )}
-      </NavLink>
+        {Icon && <Icon size={24} />}
+        {!collapsed && <span>{props.label}</span>}
+      </button>
     );
   }
-  return content;
+
+  if (props.type === "menu") {
+    return (
+      <SidebarMenu label={!collapsed ? props.label : ''} icon={props.icon} items={props.items} />
+    );
+  }
+
+  const { label, path, icon: Icon } = props;
+
+  return (
+    <NavLink
+      to={path}
+      className={({ isActive }) =>
+        `flex items-center gap-4 p-2 rounded-lg transition
+     ${isActive ? "bg-accent font-semibold" : ""}`
+      }
+    >
+      {({ isActive }) => (
+        <>
+          {Icon && <Icon size={24} className="text-foreground" />}
+          {!collapsed && <span className={isActive ? "font-semibold" : ""}>{label}</span>}
+        </>
+      )}
+    </NavLink>
+  );
 }
