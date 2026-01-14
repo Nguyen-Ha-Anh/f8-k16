@@ -4,13 +4,16 @@ import type { SidebarItemProps } from "@/types/FeedType";
 import { useSidebar } from "@/context/SidebarContext";
 
 export default function SidebarItem(props: SidebarItemProps) {
-  const { toggleSearch, collapsed } = useSidebar();
+  const { toggleSearch, collapsed, toggleNotification } = useSidebar();
 
   if (props.type === "action") {
     const Icon = props.icon;
     return (
       <button
-        onClick={toggleSearch}
+        onClick={() => {
+          if (props.action === "search") toggleSearch();
+          if (props.action === "notification") toggleNotification();
+        }}
         className="flex items-center gap-4 p-2 rounded-lg transition w-full"
       >
         {Icon && <Icon size={24} />}
@@ -21,7 +24,11 @@ export default function SidebarItem(props: SidebarItemProps) {
 
   if (props.type === "menu") {
     return (
-      <SidebarMenu label={!collapsed ? props.label : ''} icon={props.icon} items={props.items} />
+      <SidebarMenu
+        label={!collapsed ? props.label : ""}
+        icon={props.icon}
+        items={props.items}
+      />
     );
   }
 
@@ -38,7 +45,9 @@ export default function SidebarItem(props: SidebarItemProps) {
       {({ isActive }) => (
         <>
           {Icon && <Icon size={24} className="text-foreground" />}
-          {!collapsed && <span className={isActive ? "font-semibold" : ""}>{label}</span>}
+          {!collapsed && (
+            <span className={isActive ? "font-semibold" : ""}>{label}</span>
+          )}
         </>
       )}
     </NavLink>

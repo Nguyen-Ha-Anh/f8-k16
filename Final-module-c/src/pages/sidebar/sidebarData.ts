@@ -45,7 +45,7 @@ export const sidebarItems: SidebarItemProps[] = [
   { type: 'link', label: "Explore", icon: Compass, path: "/explore" },
   { type: 'link', label: "Reels", icon: Clapperboard, path: "/reels" },
   { type: 'link', label: "Messages", icon: Send, path: "/messages" },
-  { type: 'link', label: "Notifications", icon: Heart, path: "/notifications" },
+  { type: 'action', label: "Notifications", icon: Heart, action: 'notification' },
   { type: 'link', label: "Create", icon: PlusSquare, path: "/create" },
   { type: 'link', label: "Profile", path: "/profile" },
 ];

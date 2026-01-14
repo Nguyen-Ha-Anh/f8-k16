@@ -5,21 +5,44 @@ const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const [searchOpen, setSearchOpen] = useState(false);
-  const [collapsed, setCollapsed] = useState(false)
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const collapsed = searchOpen || notificationOpen
 
-  const openSearch = () => {
-    setCollapsed(true);
-    setSearchOpen(true);
-  };
+  // const openSearch = () => {
+  //   setCollapsed(true);
+  //   setSearchOpen(true);
+  // };
 
-  const closeSearch = () => {
-    setCollapsed(false);
-    setSearchOpen(false);
-  };
+  // const closeSearch = () => {
+  //   setCollapsed(false);
+  //   setSearchOpen(false);
+  // };
 
   const toggleSearch = () => {
-    setSearchOpen((prev) => !prev);
-    setCollapsed((prev) => !prev);
+    setSearchOpen((prev) => {
+      const next = !prev;
+      if (next) setNotificationOpen(false);
+      return next;
+    });
+  };
+
+  // const openNotification = () => {
+  //   setCollapsed(true);
+  //   setNotificationOpen(true);
+  //   setSearchOpen(false);
+  // };
+
+  // const closeNotification = () => {
+  //   setNotificationOpen(false);
+  //   setCollapsed(false);
+  // };
+
+  const toggleNotification = () => {
+    setNotificationOpen((prev) => {
+      const next = !prev;
+      if (next) setSearchOpen(false);
+      return next;
+    });
   };
 
   return (
@@ -27,10 +50,14 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
       value={{
         collapsed,
         searchOpen,
-        openSearch,
-        closeSearch,
-        toggleSearch
-        }}
+        notificationOpen,
+        // openSearch,
+        // closeSearch,
+        toggleSearch,
+        // openNotification,
+        // closeNotification,
+        toggleNotification,
+      }}
     >
       {children}
     </SidebarContext.Provider>

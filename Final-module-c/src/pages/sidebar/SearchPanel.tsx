@@ -22,13 +22,23 @@ export default function SearchPanel() {
   }, [query]);
 
   return (
-    <div className="w-[400px] h-screen border-l border-border bg-background p-4 flex flex-col">
+    <div className="
+      fixed
+      top-0
+      left-[59px]
+      h-screen
+      w-[396px]
+      bg-background
+      border-r
+      z-30
+      p-5">
+      <h1 className="mb-8 text-2xl font-semibold">Search</h1>
       <input
         type="text"
         placeholder="Search..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        className="w-full p-2 rounded bg-muted outline-none mb-4"
+        className="w-full p-2 pl-3 rounded rounded-full bg-muted outline-none mb-4"
       />
 
       {loading && <p className="text-sm text-gray-400">Loading...</p>}

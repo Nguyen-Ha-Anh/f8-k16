@@ -7,7 +7,7 @@ import Explore from "./pages/sidebar/Explore";
 import Reels from "./pages/sidebar/Reels";
 import Messages from "./pages/sidebar/Messages";
 import Profile from "./pages/sidebar/Profile";
-import Notifications from "./pages/sidebar/Notifications";
+import Notifications from "./pages/sidebar/NotificationPanel";
 import Create from "./pages/sidebar/Create";
 import { SidebarProvider } from "./context/SidebarContext";
 

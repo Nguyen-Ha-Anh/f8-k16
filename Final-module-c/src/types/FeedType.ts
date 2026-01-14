@@ -21,5 +21,5 @@ export type SidebarItemProps =
       type: "action";
       label: string;
       icon?: ElementType;
-      action: "search";
+      action: "search" | 'notification';
     };
