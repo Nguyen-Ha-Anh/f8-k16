@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Input } from "../ui/input";
-import type { UseFormRegister, FieldValues, Path } from "react-hook-form";
+import type { UseFormRegister, FieldValues, Path, RegisterOptions } from "react-hook-form";
 
 interface PasswordInputProps<T extends FieldValues> {
   register: UseFormRegister<T>;
   error?: string;
   value: string;
   name: Path<T>
+  rules?: RegisterOptions<T, Path<T>>;
+  label: string;
 }
 
 export default function PasswordInput<T extends FieldValues>({
@@ -14,6 +16,7 @@ export default function PasswordInput<T extends FieldValues>({
   error,
   value,
   name,
+  label
 }: PasswordInputProps<T>) {
 
   const [show, setShow] = useState<boolean>(false);
@@ -46,10 +49,10 @@ export default function PasswordInput<T extends FieldValues>({
         peer-not-placeholder-shown:top-1
         peer-not-placeholder-shown:text-xs"
       >
-        Password
+        {label}
       </label>
 
-      {/* show / hide */}
+      {/* show/hide */}
       {value.length > 0 && (
         <button
           type="button"

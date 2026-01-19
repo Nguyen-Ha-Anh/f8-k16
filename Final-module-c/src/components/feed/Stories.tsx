@@ -1,4 +1,4 @@
-import { stories } from "@/mock/storiesAPI";
+import { stories } from "@/api/storiesAPI";
 
 export default function Stories() {
   return (

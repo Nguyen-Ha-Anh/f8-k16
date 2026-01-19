@@ -1,5 +1,5 @@
-import { searchUsers } from "@/mock/searchAPI";
-import { users, type User } from "@/mock/searchData";
+import { searchUsers } from "@/api/searchAPI";
+import { users, type User } from "@/api/searchData";
 import { useEffect, useState } from "react";
 
 export default function SearchPanel() {
@@ -10,7 +10,7 @@ export default function SearchPanel() {
   useEffect(() => {
     if (!query) {
       setResults(users.slice(0, 4));
-      setLoading(false)
+      setLoading(false);
       return;
     }
 
@@ -22,7 +22,8 @@ export default function SearchPanel() {
   }, [query]);
 
   return (
-    <div className="
+    <div
+      className="
       fixed
       top-0
       left-[59px]
@@ -31,7 +32,8 @@ export default function SearchPanel() {
       bg-background
       border-r
       z-30
-      p-5">
+      p-5"
+    >
       <h1 className="mb-8 text-2xl font-semibold">Search</h1>
       <input
         type="text"

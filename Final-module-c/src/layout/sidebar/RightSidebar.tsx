@@ -1,21 +1,29 @@
-import { currentUser, suggestedUsers } from "@/mock/rightSidebarData";
+import { getAvatar } from "@/utils/getAvatar";
+import { useSelector } from "react-redux";
 
 export default function RightSidebar() {
+  const profile = useSelector((state: any) => state.auth.profile)
+
   return (
-    <aside className="hidden xl:block w-[320px] px-4 pt-8">
+    <div className="hidden xl:block w-[320px] px-4 pt-8">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <img
-            src={currentUser.avatar}
-            referrerPolicy="no-referrer"
+            src={getAvatar(profile)}
             className="w-11 h-11 rounded-full object-cover"
           />
           <div className="leading-tight">
-            <p className="font-semibold text-sm">{currentUser.username}</p>
-            <p className="text-xs text-gray-400">{currentUser.fullName}</p>
+            <p className="font-semibold text-sm">
+              {profile?.username || "username"}
+            </p>
+            <p className="text-xs text-gray-400">
+              {profile?.fullName || "Full Name"}
+            </p>
           </div>
         </div>
-        <button className="text-blue-500 text-sm font-semibold">Switch</button>
+        <button className="text-blue-500 text-sm font-semibold">
+          Switch
+        </button>
       </div>
 
       {/* title */}
@@ -26,10 +34,9 @@ export default function RightSidebar() {
 
       {/* suggested list */}
       <div className="space-y-4">
-        {suggestedUsers.map((user) => (
+        {/* {suggestedUsers.map((user) => (
           <div key={user.id} className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              {/* AVATAR */}
               <img
                 src={user.avatar}
                 className="w-9 h-9 rounded-full object-cover"
@@ -49,7 +56,7 @@ export default function RightSidebar() {
               Follow
             </button>
           </div>
-        ))}
+        ))} */}
       </div>
 
       {/* FOOTER */}
@@ -57,6 +64,6 @@ export default function RightSidebar() {
         <p>About · Help · Press · API · Jobs · Privacy · Terms</p>
         <p>© 2026 INSTAGRAM FROM META</p>
       </div>
-    </aside>
+    </div>
   );
 }

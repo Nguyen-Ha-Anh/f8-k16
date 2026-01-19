@@ -2,22 +2,28 @@ export type AuthType = {
   children: React.ReactNode;
 };
 
-// export interface PasswordInputType {
-//   value: string;
-//   onChange: (value: string) => void;
-// };
-
-export type LoginType = 'phone' | 'email' | 'username';
-
 export interface LoginFormData{
-  identifier: string;
+  email: string;
   password: string;
-  type: LoginType;
 };
 
 export interface RegisterFormData {
-  identifier: string;
+  email: string;
   password: string;
-  fullname: string;
+  confirmPassword: string;
   username: string;
+  fullName: string;
 };
+
+export interface AUthState {
+  profile: any | null
+  loading: boolean
+  error: string | null
+}
+
+export interface Profile {
+  email: string;
+  username: string;
+  fullName?: string;
+  profilePicture?: string;
+}

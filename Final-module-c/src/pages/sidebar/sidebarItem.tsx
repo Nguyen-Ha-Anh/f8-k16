@@ -5,7 +5,7 @@ import { useSidebar } from "@/context/SidebarContext";
 
 export default function SidebarItem(props: SidebarItemProps) {
   const { toggleSearch, collapsed, toggleNotification } = useSidebar();
-
+  
   if (props.type === "action") {
     const Icon = props.icon;
     return (

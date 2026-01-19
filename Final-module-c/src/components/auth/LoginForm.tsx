@@ -1,26 +1,54 @@
 import { Input } from "../ui/input";
-import { Link } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import PasswordInput from "../form/PasswordInput";
 import { useForm } from "react-hook-form";
 import type { LoginFormData } from "@/types/AuthType";
 import SubmitButton from "../form/SubmitButton";
+import { useState } from "react";
+import { loginApi } from "@/api/loginAPI";
+import { useDispatch } from "react-redux";
+import { fetchProfile } from "@/store/authSlice";
 
 export default function LoginForm() {
   // const [password, setPassword] = useState<string>('')
+  const navigate = useNavigate();
+  const dispatch = useDispatch()
+  const [serverError, setServerError] = useState("");
 
   const {
     register,
     watch,
     handleSubmit,
-    formState: { errors, isValid, isSubmitted },
+    formState: { errors, isValid },
   } = useForm<LoginFormData>({
     mode: "onChange",
   });
 
   const passwordValue = watch("password") || "";
 
-  const onSubmit = (data: LoginFormData) => {
-    console.log("login", data);
+  const onSubmit = async (data: LoginFormData) => {
+    setServerError("");
+
+    try {
+      
+      const res = await loginApi(data);
+      const { tokens, user } = res.data;
+
+      // luu token
+      localStorage.setItem("accessToken", tokens.accessToken);
+      localStorage.setItem("refreshToken", tokens.refreshToken);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      //load profile va redux
+      await dispatch(fetchProfile() as any)
+      
+      //chuyen page
+      navigate("/home");
+    } catch (err: any) {
+      console.log(err);
+
+      setServerError(err.response?.data?.message || "Login failed");
+    }
   };
 
   return (
@@ -47,20 +75,20 @@ export default function LoginForm() {
             >
               Instagram
             </h1>
-
+            
             {/* username */}
             <div className="relative">
               <Input
                 id="username"
                 type="text"
                 placeholder=" "
-                {...register("identifier", {
+                {...register("email", {
                   required: true,
                 })}
                 className="peer h-[40px] w-full bg-background text-foreground border border-[#363636]
-              text-white text-sm px-3 pt-6 pb-2 rounded-sm 
-             focus:outline-none <mb-1></mb-1>
-              placeholder-transparent"
+                text-white text-sm px-3 pt-6 pb-2 rounded-sm 
+                focus:outline-none <mb-1></mb-1>
+                placeholder-transparent"
               />
               <label
                 htmlFor="username"
@@ -70,10 +98,10 @@ export default function LoginForm() {
                 peer-not-placeholder-shown:top-1 cursor-text
                 peer-not-placeholder-shown:text-xs"
               >
-                Phone number, username, or email
+                Email
               </label>
               <p className="min-h-[10px] text-sm text-red-500">
-                {errors?.identifier?.message || ""}
+                {errors?.email?.message || ""}
               </p>
             </div>
 
@@ -81,6 +109,7 @@ export default function LoginForm() {
             <div className="relative mb-2">
               <PasswordInput<LoginFormData>
                 register={register}
+                label="Password"
                 name="password"
                 error={errors.password?.message}
                 value={passwordValue}
@@ -117,27 +146,28 @@ export default function LoginForm() {
               Log in with Facebook
             </div>
 
-            {isSubmitted && isValid && (
+            {serverError && (
               <div className="text-red-500 text-sm mt-2 text-center">
-                <p>Sorry, your password was incorrect.</p>
-                <p> Please double-check your password.</p>
+                <p>{serverError}</p>
               </div>
             )}
 
             {/* forgot password */}
-            <p className="text-center font-semibold text-sm hover:underline text-white mt-6 cursor-pointer">
+            <NavLink
+            to='/forgot-password'
+            className="block text-center font-semibold text-sm hover:underline text-white mt-6 cursor-pointer">
               Forgot password?
-            </p>
+            </NavLink>
 
             {/* sign up */}
             <p className="text-center text-sm text-white mt-10">
               Don't have an account?{" "}
-              <Link
+              <NavLink
                 to="/register"
                 className="text-[#708DFF] font-semibold cursor-pointer"
               >
                 Sign up
-              </Link>
+              </NavLink>
             </p>
           </div>
         </div>

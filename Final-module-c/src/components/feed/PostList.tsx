@@ -1,4 +1,4 @@
-import { posts } from "@/mock/postAPI";
+import { posts } from "@/api/postAPI";
 import PostItem from "./PostItem";
 
 export default function PostList() {

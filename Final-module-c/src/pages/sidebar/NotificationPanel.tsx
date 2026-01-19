@@ -1,4 +1,4 @@
-import { notifications } from "@/mock/notificationAPI";
+import { notifications } from "@/api/notificationAPI";
 
 export default function NotificationPanel() {
   return (

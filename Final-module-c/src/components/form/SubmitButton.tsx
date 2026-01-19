@@ -10,7 +10,7 @@ export default function SubmitButton({ label, disabled }: SubmitButtonProps) {
     <Button
       type="submit"
       disabled={disabled}
-      className={`w-full font-semibold py-2 rounded-lg mb-4 transition
+      className={`w-full font-semibold py-2 rounded-lg mb-4 transition text-white
         ${
           disabled
             ? "bg-[#4A5DF9] cursor-not-allowed"

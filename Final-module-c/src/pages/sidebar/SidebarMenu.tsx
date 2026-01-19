@@ -7,7 +7,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useSidebar } from "@/context/SidebarContext";
 import { useTheme } from "@/layout/switch/ThemeProvider";
+import { logout } from "@/store/authSlice";
 import { Sun, Moon } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 type MenuItem = {
   label: string;
@@ -28,6 +31,9 @@ export default function SidebarMenu({
 }: SidebarMenuProps) {
   const { theme, setTheme } = useTheme();
   const { collapsed } = useSidebar();
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -51,7 +57,10 @@ export default function SidebarMenu({
                   setTheme(theme === "dark" ? "light" : "dark");
                 }
                 if (item.label === "Log out") {
-                  console.log("logout");
+                  // console.log("logout");
+                  dispatch(logout())
+                  localStorage.removeItem('accessToken')
+                  navigate('/')
                 }
               }}
             >

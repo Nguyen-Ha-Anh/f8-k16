@@ -5,22 +5,42 @@ import PasswordInput from "../form/PasswordInput";
 import { useForm } from "react-hook-form";
 import type { RegisterFormData } from "@/types/AuthType";
 import SubmitButton from "../form/SubmitButton";
+import { registerApi } from "@/api/registerAPI";
+import { useState } from "react";
 
 export default function RegisterForm() {
+  const [serverError, setServerError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
   const {
     register,
     watch,
     handleSubmit,
     formState: { errors, isValid },
   } = useForm<RegisterFormData>({
-    mode: 'onChange'
+    mode: "onChange",
   });
 
-  const onSubmit = (data: RegisterFormData) => {
-    console.log("login", data);
-  };
+  const onSubmit = async (data: RegisterFormData) => {
+    setServerError("");
+    setSuccessMessage("");
+    // console.log("login", data);
 
-  const passwordValue = watch("password") || "";
+    const payload = {
+      ...data,
+      username: data.username.toLowerCase().trim(),
+      email: data.email.trim(),
+    };
+
+    try {
+      const result = await registerApi(payload);
+      setSuccessMessage(
+        "Sign up successful! Please check your email to verify your account."
+      );
+    } catch (error: any) {
+      setServerError(error.response?.data?.message || "Register failed");
+    }
+  };
 
   return (
     <form
@@ -42,7 +62,7 @@ export default function RegisterForm() {
           </p>
 
           {/* facebook */}
-          <Button className="w-full bg-[#4A5DF9] hover:bg-[#4451c7]">
+          <Button className="w-full bg-[#4A5DF9] hover:bg-[#4451c7] text-white">
             <svg
               width="20px"
               height="20px"
@@ -78,13 +98,16 @@ export default function RegisterForm() {
           <div>
             <div className="relative">
               <Input
-                id="usernameRegister"
-                type="text"
+                id="email"
+                type="email"
                 placeholder=" "
+                {...register("email", {
+                  required: "Email is required",
+                })}
                 className="peer h-[40px] w-full bg-[#25292E] border border-[#363636]
-              text-white text-sm px-3 pt-6 pb-2 rounded-sm 
-             focus:outline-none mb-1
-              placeholder-transparent"
+                text-white text-sm px-3 pt-6 pb-2 rounded-sm 
+                focus:outline-none mb-1
+                placeholder-transparent"
               />
               <label
                 htmlFor="usernameRegister"
@@ -94,15 +117,40 @@ export default function RegisterForm() {
                 peer-not-placeholder-shown:top-1 cursor-text
                 peer-not-placeholder-shown:text-xs"
               >
-                Mobile Number or Email
+                Enter your email
               </label>
             </div>
 
             <PasswordInput<RegisterFormData>
               register={register}
               name="password"
+              label="Password"
               error={errors.password?.message}
-              value={passwordValue}
+              value={watch("password") || ""}
+              rules={{
+                required: "Password is required",
+                minLength: {
+                  value: 8,
+                  message: "Password must be at least 8 characters",
+                },
+              }}
+            />
+
+            <PasswordInput<RegisterFormData>
+              register={register}
+              name="confirmPassword"
+              label="Confirm password"
+              error={errors.confirmPassword?.message}
+              value={watch("confirmPassword") || ""}
+              rules={{
+                required: "Confirm password is required",
+                validate: (value: string) => {
+                  if (!watch("password")) return true;
+                  return (
+                    value === watch("password") || "Passwords do not match"
+                  );
+                },
+              }}
             />
 
             <div className="relative">
@@ -110,7 +158,9 @@ export default function RegisterForm() {
                 id="fullName"
                 type="text"
                 placeholder=" "
-                {...register('fullname', {required: true})}
+                {...register("fullName", {
+                  required: "Full name is required",
+                })}
                 className="peer h-[40px] w-full bg-[#25292E] border border-[#363636]
               text-white text-sm px-3 pt-6 pb-2 rounded-sm 
              focus:outline-none mb-1
@@ -133,11 +183,18 @@ export default function RegisterForm() {
                 id="username"
                 type="text"
                 placeholder=" "
-                {...register('username', {required: true})}
+                {...register("username", {
+                  required: "Username is required",
+                  pattern: {
+                    value: /^[a-z0-9_]+$/,
+                    message:
+                      "Username can only contain lowercase letters, numbers and _",
+                  },
+                })}
                 className="peer h-[40px] w-full bg-[#25292E] border border-[#363636]
-              text-white text-sm px-3 pt-6 pb-2 rounded-sm 
-             focus:outline-none
-              placeholder-transparent"
+                text-white text-sm px-3 pt-6 pb-2 rounded-sm 
+                focus:outline-none
+                placeholder-transparent"
               />
               <label
                 htmlFor="username"
@@ -166,7 +223,18 @@ export default function RegisterForm() {
           </p>
 
           {/* sign up */}
-          <SubmitButton label="Sign up" disabled={!isValid}/>
+          <SubmitButton label="Sign up" disabled={!isValid} />
+          {successMessage && (
+            <p className="text-sm text-green-500 text-center mt-3">
+              {successMessage}
+            </p>
+          )}
+
+          {serverError && (
+            <p className="text-sm text-red-500 text-center mb-3">
+              {serverError}
+            </p>
+          )}
         </div>
 
         {/* footer */}
