@@ -1,13 +1,22 @@
+export type User = {
+  _id: string;
+  username: string;
+  fullName: string;
+  profilePicture: string;
+};
+
 export type Post = {
-  id: number;
+  _id: string;
+  image?: string;
+  video?: string
+  caption: string;
   user: {
+    _id: string;
     username: string;
-    avatar: string;
-  };
-  image: string;
+    profilePicture?: string | null;
+  } 
   likes: number;
   comments: number;
-  repeat: number;
-  caption: string;
-  time: string;
+  createdAt: string;
+  mediaType?: 'image' | 'video'
 };

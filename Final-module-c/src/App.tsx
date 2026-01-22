@@ -15,6 +15,7 @@ import ForgotPassword from "./pages/password/ForgotPassword";
 import ResetPassword from "./pages/password/ResetPassword";
 import EditProfile from "./pages/profile/EditProfile";
 import UserProfile from "./pages/profile/UserProfile";
+import PostDetail from "./pages/posts/PostDetail";
 
 export default function App() {
   return (
@@ -36,6 +37,7 @@ export default function App() {
           <Route path="profile" element={<Profile />} />
           <Route path='profile/edit' element={<EditProfile/>}/>
           <Route path='profile/:userId' element={<UserProfile/>}/>
+          <Route path="posts/:postId" element={<PostDetail />} />
         </Route>
       </Routes>
     </SidebarProvider>

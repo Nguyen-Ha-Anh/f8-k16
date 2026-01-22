@@ -1,8 +1,26 @@
+import { getSuggestedUsers } from "@/api/users/userAPI";
+import type { SuggestedUser } from "@/types/rightSidebarType";
 import { getAvatar } from "@/utils/getAvatar";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { NavLink } from "react-router-dom";
 
 export default function RightSidebar() {
-  const profile = useSelector((state: any) => state.auth.profile)
+  const profile = useSelector((state: any) => state.auth.profile);
+  const [suggestedUsers, setSuggestedUsers] = useState<SuggestedUser[]>([]);
+
+  useEffect(() => {
+    const fetchSuggested = async () => {
+      try {
+        const data = await getSuggestedUsers(5);
+        console.log("suggested:", data);
+        setSuggestedUsers(data);
+      } catch (err) {
+        console.error("failed", err);
+      }
+    };
+    fetchSuggested();
+  }, []);
 
   return (
     <div className="hidden xl:block w-[320px] px-4 pt-8">
@@ -21,9 +39,7 @@ export default function RightSidebar() {
             </p>
           </div>
         </div>
-        <button className="text-blue-500 text-sm font-semibold">
-          Switch
-        </button>
+        <button className="text-blue-500 text-sm font-semibold">Switch</button>
       </div>
 
       {/* title */}
@@ -34,32 +50,31 @@ export default function RightSidebar() {
 
       {/* suggested list */}
       <div className="space-y-4">
-        {/* {suggestedUsers.map((user) => (
-          <div key={user.id} className="flex items-center justify-between">
+        {suggestedUsers.map((user) => (
+          <NavLink 
+            to={`/profile/${user._id}`}
+            key={user._id} 
+            className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <img
-                src={user.avatar}
+                src={getAvatar(user)}
                 className="w-9 h-9 rounded-full object-cover"
               />
-
               <div className="leading-tight">
                 <p className="text-sm font-semibold">{user.username}</p>
-                <p className="text-xs text-gray-400">
-                  {user.followedBy
-                    ? `Followed by ${user.followedBy}`
-                    : "Suggested for you"}
-                </p>
+                <p className="text-xs text-gray-400">Suggested for you</p>
               </div>
             </div>
-
-            <button className="text-blue-500 text-xs font-semibold">
+            <button 
+              className="text-blue-500 text-xs font-semibold"
+              onClick={(e) => e.preventDefault()}>
               Follow
             </button>
-          </div>
-        ))} */}
+          </NavLink>
+        ))}
       </div>
 
-      {/* FOOTER */}
+      {/* footer */}
       <div className="mt-10 text-xs text-gray-500 space-y-2">
         <p>About · Help · Press · API · Jobs · Privacy · Terms</p>
         <p>© 2026 INSTAGRAM FROM META</p>

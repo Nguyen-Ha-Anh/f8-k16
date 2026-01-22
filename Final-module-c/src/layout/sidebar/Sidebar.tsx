@@ -14,6 +14,7 @@ export default function Sidebar() {
     <div
       className={`
       fixed left-0 top-0 z-50
+      py-5
       h-screen
       flex flex-col
       border-r border-border

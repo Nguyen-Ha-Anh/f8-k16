@@ -1,9 +1,9 @@
 export type User = {
-  id: number;
+  _id: number;
   username: string;
   fullName: string;
-  avatar: string;
-  followedBy?: string
+  profilePicture: string;
+  isFollowing: boolean;
 };
 
 export type SuggestedUser = User & {

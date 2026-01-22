@@ -1,24 +1,32 @@
-import { searchUsers } from "@/api/searchAPI";
-import { users, type User } from "@/api/searchData";
+import { searchUsers } from "@/api/search/searchAPI";
+import type { UserProfile } from "@/types/userType";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function SearchPanel() {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<User[]>([]);
+  const [results, setResults] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (!query) {
-      setResults(users.slice(0, 4));
-      setLoading(false);
+      setResults([])
       return;
     }
 
-    setLoading(true);
-    searchUsers(query).then((res) => {
-      setResults(res);
-      setLoading(false);
-    });
+    //debounce
+    const timeout = setTimeout(() => {
+      setLoading(true)
+      searchUsers(query)
+      .then((res) => {
+        setResults(res)
+      })
+      .finally(() => setLoading(false))
+    }, 500)
+
+    return () => clearTimeout(timeout)
   }, [query]);
 
   return (
@@ -52,11 +60,12 @@ export default function SearchPanel() {
       <div className="flex-1 overflow-y-auto">
         {results.map((user) => (
           <div
-            key={user.id}
+            key={user._id}
+            onClick={() => navigate(`/profile/${user._id}`)}
             className="flex items-center gap-3 p-2 hover:bg-accent rounded cursor-pointer"
           >
             <img
-              src={user.avatar}
+              src={user.profilePicture || '/avaauto.jpg'}
               alt={user.username}
               className="w-10 h-10 rounded-full object-cover"
             />
