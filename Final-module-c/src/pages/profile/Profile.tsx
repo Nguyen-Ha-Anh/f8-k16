@@ -2,14 +2,37 @@ import { useDispatch, useSelector } from "react-redux";
 import { Settings, Grid, Bookmark, UserSquare2, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getAvatar } from "@/utils/getAvatar";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { fetchProfile } from "@/store/authSlice";
 import { useNavigate } from "react-router-dom";
+import type { Post } from "@/types/posts/PostType";
+import axiosClient from "@/api/profile/axiosClient";
 
 export default function Profile() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const profile = useSelector((state: any) => state.auth.profile);
   const dispatch = useDispatch();
+
+  const [posts, setPosts] = useState<Post[]>([]);
+
+  useEffect(() => {
+    if (profile?._id) {
+      axiosClient
+        .get(`/posts/user/${profile._id}`)
+        .then((res) => {
+          const raw = res.data?.data;
+
+          if (Array.isArray(raw)) {
+            setPosts(raw);
+          } else if (Array.isArray(raw?.posts)) {
+            setPosts(raw.posts);
+          } else {
+            setPosts([]);
+          }
+        })
+        .catch(() => setPosts([]));
+    }
+  }, [profile]);
 
   useEffect(() => {
     if (!profile) {
@@ -43,7 +66,7 @@ export default function Profile() {
 
             <div className="flex gap-8 text-sm">
               <span>
-                <b>{profile?.posts || 0}</b> posts
+                <b>{posts.length}</b> posts
               </span>
               <span>
                 <b>{profile?.followers || 0}</b> followers
@@ -60,11 +83,11 @@ export default function Profile() {
         </div>
 
         <div className="flex gap-2 mt-10">
-          <Button 
-            variant="secondary" 
-            size="lg" 
+          <Button
+            variant="secondary"
+            size="lg"
             className="px-32"
-            onClick={() => navigate('/profile/edit')}
+            onClick={() => navigate("/profile/edit")}
           >
             Edit profile
           </Button>
@@ -93,21 +116,41 @@ export default function Profile() {
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center mt-24 text-center">
-          <div className="w-20 h-20 border-2 border-foreground rounded-full flex items-center justify-center mb-6">
-            <Camera size={32} />
+        {posts.length === 0 ? (
+          <div className="flex flex-col items-center justify-center mt-24 text-center">
+            <div className="w-20 h-20 border-2 border-foreground rounded-full flex items-center justify-center mb-6">
+              <Camera size={32} />
+            </div>
+
+            <h2 className="text-2xl font-bold">Share Photos</h2>
+
+            <p className="text-foreground mt-2">
+              When you share photos, they will appear on your profile.
+            </p>
+
+            <button className="text-[#85A1FF] mt-4 hover:underline">
+              Share your first photo
+            </button>
           </div>
+        ) : (
+          <div className="grid grid-cols-3 gap-1 mt-10">
+            {posts.map((post) => {
+              const img = post.image?.startsWith("http")
+                ? post.image
+                : `https://instagram.f8team.dev${post.image}`;
 
-          <h2 className="text-2xl font-bold">Share Photos</h2>
-
-          <p className="text-foreground mt-2">
-            When you share photos, they will appear on your profile.
-          </p>
-
-          <button className="text-[#85A1FF] mt-4 hover:underline">
-            Share your first photo
-          </button>
-        </div>
+              return (
+                <div key={post._id} className="aspect-square overflow-hidden">
+                  <img
+                    src={img}
+                    onClick={() => navigate(`/posts/${post._id}`)}
+                    className="w-full h-full object-cover hover:opacity-80 cursor-pointer"
+                  />
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

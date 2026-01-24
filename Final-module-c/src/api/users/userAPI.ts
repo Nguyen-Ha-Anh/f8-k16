@@ -1,4 +1,4 @@
-import type { UserProfile } from "@/types/userType";
+import type { UserProfile } from "@/types/users/userType";
 import axiosClient from "../profile/axiosClient";
 
 export const getSuggestedUsers = async (limit = 5) => {
@@ -9,7 +9,7 @@ export const getSuggestedUsers = async (limit = 5) => {
 export const getUserById = async (userId: string): Promise<UserProfile> => {
   const res = await axiosClient.get(`/users/${userId}`);
 
-  const raw = res.data?.data
+  const raw = res.data?.data;
   if (!raw) {
     throw new Error("User not found");
   }
@@ -24,6 +24,5 @@ export const getUserById = async (userId: string): Promise<UserProfile> => {
     followingCount: raw.followingCount ?? 0,
     isFollowing: raw.isFollowing ?? false,
     posts: raw.posts || [],
-
   };
 };

@@ -1,4 +1,4 @@
-import type { UserProfile } from "@/types/userType";
+import type { UserProfile } from "@/types/users/userType";
 import axiosClient from "../profile/axiosClient";
 
 export const searchUsers = async (query: string): Promise<UserProfile[]> => {

@@ -1,5 +1,5 @@
 import axiosClient from "@/api/profile/axiosClient";
-import type { Post } from "@/types/PostType";
+import type { Post } from "@/types/posts/PostType";
 
 export const getFeedPosts = async (limit = 20, offset = 0): Promise<Post[]> => {
   const res = await axiosClient.get("/posts/feed", {
@@ -12,10 +12,10 @@ export const getFeedPosts = async (limit = 20, offset = 0): Promise<Post[]> => {
     ...post,
     user: {
       ...(post.user || post.userId),
-      profilePicture: 
-      (post.user || post.userId)?.profilePicture ||
-      (post.user || post.userId)?.avatar || 
-      null
-    }
-  }))
+      profilePicture:
+        (post.user || post.userId)?.profilePicture ||
+        (post.user || post.userId)?.avatar ||
+        null,
+    },
+  }));
 };

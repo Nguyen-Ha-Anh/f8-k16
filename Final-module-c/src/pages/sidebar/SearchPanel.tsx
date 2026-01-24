@@ -1,5 +1,5 @@
 import { searchUsers } from "@/api/search/searchAPI";
-import type { UserProfile } from "@/types/userType";
+import type { UserProfile } from "@/types/users/userType";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -8,25 +8,25 @@ export default function SearchPanel() {
   const [results, setResults] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!query) {
-      setResults([])
+      setResults([]);
       return;
     }
 
     //debounce
     const timeout = setTimeout(() => {
-      setLoading(true)
+      setLoading(true);
       searchUsers(query)
-      .then((res) => {
-        setResults(res)
-      })
-      .finally(() => setLoading(false))
-    }, 500)
+        .then((res) => {
+          setResults(res);
+        })
+        .finally(() => setLoading(false));
+    }, 500);
 
-    return () => clearTimeout(timeout)
+    return () => clearTimeout(timeout);
   }, [query]);
 
   return (
@@ -65,7 +65,7 @@ export default function SearchPanel() {
             className="flex items-center gap-3 p-2 hover:bg-accent rounded cursor-pointer"
           >
             <img
-              src={user.profilePicture || '/avaauto.jpg'}
+              src={user.profilePicture || "/avaauto.jpg"}
               alt={user.username}
               className="w-10 h-10 rounded-full object-cover"
             />

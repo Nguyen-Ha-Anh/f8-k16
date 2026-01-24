@@ -1,5 +1,5 @@
 import { useAutoPlayVideo } from "@/hooks/useAutoPlayVideo";
-import type { Post } from "@/types/PostType";
+import type { Post } from "@/types/posts/PostType";
 import { getAvatar } from "@/utils/getAvatar";
 import { Heart, MessageCircle, Repeat2, Send } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -68,14 +68,14 @@ export default function PostItem({ post }: { post: Post }) {
       )}
 
       {/* actions */}
-      <div className="flex gap-4">
+      <div className="flex gap-4 select-none">
         <div className="flex gap-1 mt-3 text-xl items-center mb-2">
           <Heart />
-          <p className="text-sm font-semibold">{post.likes || 0}</p>
+          <p className="text-sm font-semibold ">{post.likes || 0}</p>
         </div>
         <div className="flex gap-1 mt-3 text-xl items-center mb-2">
           <MessageCircle />
-          <p className="text-sm font-semibold">{post.comments || 0}</p>
+          <p className="text-sm font-semibold">{post.comments|| 0}</p>
         </div>
         <div className="flex gap-1 mt-3 text-xl items-center mb-2">
           <Repeat2 />

@@ -5,6 +5,14 @@ export type User = {
   profilePicture: string;
 };
 
+export type Comment = {
+  _id: string;
+  content: string;
+  user: {
+    username: string;
+  };
+};
+
 export type Post = {
   _id: string;
   image?: string;

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import PostItem from "./PostItem";
-import type { Post } from "@/types/PostType";
+import type { Post } from "@/types/posts/PostType";
 import { getFeedPosts } from "@/api/posts/postAPI";
 
 export default function PostList() {

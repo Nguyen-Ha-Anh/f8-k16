@@ -1,8 +1,8 @@
-import { useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getAvatar } from "@/utils/getAvatar";
 import { Button } from "@/components/ui/button";
-import type { UserProfile } from "@/types/userType";
+import type { UserProfile } from "@/types/users/userType";
 import { getUserById } from "@/api/users/userAPI";
 import { getUserPosts } from "@/api/posts/userPostsAPI";
 import { Bookmark, Clapperboard, Grid } from "lucide-react";
@@ -19,6 +19,9 @@ export default function UserProfile() {
   const [activeTab, setActiveTab] = useState<"posts" | "video" | "saved">(
     "posts",
   );
+
+  const location = useLocation()
+  const navigate = useNavigate()
 
   const limit = 20;
 
@@ -151,6 +154,11 @@ export default function UserProfile() {
           return (
             <div
               key={post._id}
+              onClick={() => 
+                navigate(`/posts/${post._id}`, {
+                  state: {backgroundLocation: location}
+                })
+              }
               className="aspect-square overflow-hidden bg-black"
             >
               {post.mediaType === "image" ? (

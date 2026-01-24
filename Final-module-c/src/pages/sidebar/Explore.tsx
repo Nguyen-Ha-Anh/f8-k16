@@ -3,13 +3,22 @@ import type { ExplorePost, ExplorePagination } from "@/types/exploreType";
 import { Heart, MessageCircle } from "lucide-react";
 import { getExplorePosts } from "@/api/posts/exploreAPI";
 import { resolveMedia } from "@/utils/resolveMedia";
-import { NavLink } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function Explore() {
   const [posts, setPosts] = useState<ExplorePost[]>([]);
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState<ExplorePagination | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const openPost = (postId: string) => {
+    navigate(`/posts/${postId}`, {
+      state: { backgroundLocation: location },
+    });
+  };
 
   const fetchExplore = async () => {
     setLoading(true);
@@ -31,7 +40,11 @@ export default function Explore() {
     <div className="p-6 max-w-[935px] mx-auto">
       <div className="grid grid-cols-3 gap-1">
         {posts.map((post) => (
-          <NavLink key={post._id} to={`/posts/${post._id}`}>
+          <div
+            key={post._id}
+            onClick={() => openPost(post._id)}
+            className="relative group cursor-pointer"
+          >
             {post.mediaType === "image" ? (
               <img
                 src={resolveMedia(post.image)}
@@ -54,7 +67,7 @@ export default function Explore() {
                 {post.comments}
               </p>
             </div>
-          </NavLink>
+          </div>
         ))}
       </div>
 

@@ -21,5 +21,6 @@ export type SidebarItemProps =
       type: "action";
       label: string;
       icon?: ElementType;
-      action: "search" | 'notification';
+      action: "search" | 'notification' | 'create';
+      onCreate?: () => void
     };

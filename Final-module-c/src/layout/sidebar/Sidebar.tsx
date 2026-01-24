@@ -5,10 +5,13 @@ import { Instagram } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { getAvatar } from "@/utils/getAvatar";
+import { useState } from "react";
 
 export default function Sidebar() {
   const { collapsed } = useSidebar();
   const profile = useSelector((state: any) => state.auth.profile);
+
+  const [openCreate, setOpenCreate] = useState(false);
 
   return (
     <div
@@ -59,15 +62,35 @@ export default function Sidebar() {
             );
           }
 
+          if (item.type === "action") {
+            return (
+              <SidebarItem
+                key={item.label}
+                {...item}
+                onCreate={() => setOpenCreate(true)}
+              />
+            );
+          }
+
           return <SidebarItem key={item.label} {...item} />;
         })}
       </div>
 
       {/* buttom sidebar */}
       <div className="mt-auto space-y-2">
-        {bottomSidebarItems.map((item) => (
-          <SidebarItem key={item.label} {...item} />
-        ))}
+        {bottomSidebarItems.map((item) => {
+          if (item.type === "action") {
+            return (
+              <SidebarItem
+                key={item.label}
+                {...item}
+                onCreate={() => setOpenCreate(true)}
+              />
+            );
+          }
+
+          return <SidebarItem key={item.label} {...item} />;
+        })}
       </div>
     </div>
   );
