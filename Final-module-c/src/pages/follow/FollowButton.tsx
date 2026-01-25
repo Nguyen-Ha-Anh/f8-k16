@@ -40,10 +40,10 @@ export default function FollowButton({
     <button
       disabled={loading}
       onClick={toggleFollow}
-      className={`px-4 py-1 rounded transition ${
+      className={`px-4 py-1 rounded rounded-xl transition ${
         isFollowing
-          ? "bg-gray-300 text-black hover:bg-gray-400"
-          : "bg-blue-500 text-white hover:bg-blue-600"
+          ? "bg-[#4A5DF9] text-white hover:bg-[bg-[#4A5DF9]/80 px-40"
+          : "bg-[#4A5DF9] text-white hover:bg-blue-600 px-40"
       } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
     >
       {loading ? "..." : isFollowing ? "Following" : "Follow"}
