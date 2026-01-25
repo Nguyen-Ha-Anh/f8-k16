@@ -14,31 +14,70 @@ export default function Profile() {
   const dispatch = useDispatch();
 
   const [posts, setPosts] = useState<Post[]>([]);
+  const [activeTab, setActiveTab] = useState<"posts" | "saved" | "tagged">(
+    "posts",
+  );
+  const [filter, setFilter] = useState<"all" | "saved" | "tagged">("all");
+  const [page, setPage] = useState(0);
+
+  const [savedPosts, setSavedPosts] = useState<Post[]>([]);
+
+  const limit = 20;
 
   useEffect(() => {
-    if (profile?._id) {
-      axiosClient
-        .get(`/posts/user/${profile._id}`)
-        .then((res) => {
-          const raw = res.data?.data;
+    if (!profile?._id) return;
 
-          if (Array.isArray(raw)) {
-            setPosts(raw);
-          } else if (Array.isArray(raw?.posts)) {
-            setPosts(raw.posts);
-          } else {
-            setPosts([]);
-          }
-        })
-        .catch(() => setPosts([]));
+    const offset = page * limit;
+
+    let url = "";
+
+    if (filter === "saved") {
+      url = `/posts/saved`;
+    } else {
+      url = `/posts/user/${profile._id}`;
     }
-  }, [profile]);
+
+    axiosClient
+      .get(url, {
+        params: {
+          limit,
+          offset,
+        },
+      })
+      .then((res) => {
+        const raw = res.data?.data;
+
+        const list =
+          filter === "saved"
+            ? raw?.savedPosts || []
+            : Array.isArray(raw)
+              ? raw
+              : raw?.posts || [];
+
+        if (filter === "saved") {
+          if (page === 0) {
+            setSavedPosts(list);
+          } else {
+            setSavedPosts((prev) => [...prev, ...list]);
+          }
+        } else {
+          if (page === 0) {
+            setPosts(list);
+          } else {
+            setPosts((prev) => [...prev, ...list]);
+          }
+        }
+      })
+      .catch(() => setPosts([]));
+  }, [profile, filter, page]);
 
   useEffect(() => {
     if (!profile) {
       dispatch(fetchProfile() as any);
     }
   }, [dispatch, profile]);
+
+  const data = activeTab === "saved" ? savedPosts : posts;
 
   return (
     <div className="min-h-screen bg-background text-foreground pl-[240px]">
@@ -99,42 +138,78 @@ export default function Profile() {
 
         <div className="mt-10 border-t border-border">
           <div className="flex justify-center gap-16 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2 text-foreground border-t border-foreground pt-4 -mt-px">
+            <div
+              onClick={() => {
+                setActiveTab("posts");
+                setFilter("all");
+                setPage(0);
+              }}
+              className={`flex items-center gap-2 pt-4 cursor-pointer transition
+              ${
+                activeTab === "posts"
+                  ? "text-foreground border-t border-foreground -mt-px"
+                  : "hover:text-foreground"
+              }`}
+            >
               <Grid size={16} />
               POSTS
             </div>
 
-            <div className="flex items-center gap-2 pt-4 hover:text-foreground cursor-pointer">
+            <div
+              onClick={() => {
+                setActiveTab("saved");
+                setFilter("saved");
+                setPage(0);
+              }}
+              className={`flex items-center gap-2 pt-4 cursor-pointer transition
+              ${
+                activeTab === "saved"
+                  ? "text-foreground border-t border-foreground -mt-px"
+                  : "hover:text-foreground"
+              }`}
+            >
               <Bookmark size={16} />
               SAVED
             </div>
 
-            <div className="flex items-center gap-2 pt-4 hover:text-foreground cursor-pointer">
+            <div
+              onClick={() => {
+                setActiveTab("tagged");
+                setFilter("tagged");
+                setPage(0);
+              }}
+              className={`flex items-center gap-2 pt-4 cursor-pointer transition
+              ${
+                activeTab === "tagged"
+                  ? "text-foreground border-t border-foreground -mt-px"
+                  : "hover:text-foreground"
+              }`}
+            >
               <UserSquare2 size={16} />
               TAGGED
             </div>
           </div>
         </div>
 
-        {posts.length === 0 ? (
+        {data.length === 0 ? (
           <div className="flex flex-col items-center justify-center mt-24 text-center">
             <div className="w-20 h-20 border-2 border-foreground rounded-full flex items-center justify-center mb-6">
               <Camera size={32} />
             </div>
 
-            <h2 className="text-2xl font-bold">Share Photos</h2>
+            <h2 className="text-2xl font-bold">
+              {activeTab === "saved" ? "No Saved Posts" : "Share Photos"}
+            </h2>
 
             <p className="text-foreground mt-2">
-              When you share photos, they will appear on your profile.
+              {activeTab === "saved"
+                ? "Posts you save will appear here."
+                : "When you share photos, they will appear on your profile."}
             </p>
-
-            <button className="text-[#85A1FF] mt-4 hover:underline">
-              Share your first photo
-            </button>
           </div>
         ) : (
           <div className="grid grid-cols-3 gap-1 mt-10">
-            {posts.map((post) => {
+            {data.map((post) => {
               const img = post.image?.startsWith("http")
                 ? post.image
                 : `https://instagram.f8team.dev${post.image}`;

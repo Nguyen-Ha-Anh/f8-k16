@@ -1,12 +1,13 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Heart, MoreHorizontal, Send, X } from "lucide-react";
+import { MoreHorizontal, Send, X } from "lucide-react";
 import { resolveMedia } from "@/utils/resolveMedia";
 import { getPostDetail } from "@/api/posts/postDetailAPI";
 import { getAvatar } from "@/utils/getAvatar";
 import { useSelector } from "react-redux";
 import axiosClient from "@/api/profile/axiosClient";
 import { deletePost } from "@/api/posts/deletePostAPI";
+import LikeButton from "./LikeButton";
 
 export default function PostDetail() {
   const { postId } = useParams();
@@ -183,7 +184,10 @@ export default function PostDetail() {
 
           <div className="border-t p-4">
             <div className="flex items-center gap-4 mb-2">
-              <Heart className="cursor-pointer hover:text-red-500 transition" />
+              <LikeButton
+                postId={post._id}
+                initialLikes={post.likes}
+              />
               <span className="text-sm">
                 <b>{post.likes}</b> likes
               </span>

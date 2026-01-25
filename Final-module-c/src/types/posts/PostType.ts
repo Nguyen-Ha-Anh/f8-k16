@@ -27,4 +27,8 @@ export type Post = {
   comments: number;
   createdAt: string;
   mediaType?: 'image' | 'video'
+
+  isSaved?: boolean;
 };
+
+
