@@ -47,12 +47,11 @@ export default function Profile() {
       .then((res) => {
         const raw = res.data?.data;
 
-        const list =
-          filter === "saved"
-            ? raw?.savedPosts || []
-            : Array.isArray(raw)
-              ? raw
-              : raw?.posts || [];
+        const list = Array.isArray(raw)
+          ? raw
+          : Array.isArray(raw?.posts)
+            ? raw.posts
+            : [];
 
         if (filter === "saved") {
           if (page === 0) {
