@@ -7,6 +7,7 @@ import { getUserById } from "@/api/users/userAPI";
 import { getUserPosts } from "@/api/posts/userPostsAPI";
 import { Bookmark, Clapperboard, Grid } from "lucide-react";
 import { resolveMedia } from "@/utils/resolveMedia";
+import FollowButton from "../follow/FollowButton";
 
 export default function UserProfile() {
   const { userId } = useParams();
@@ -20,8 +21,16 @@ export default function UserProfile() {
     "posts",
   );
 
-  const location = useLocation()
-  const navigate = useNavigate()
+  const [, setFollowers] = useState<number>(0);
+
+  useEffect(() => {
+    if (user?.followersCount !== undefined) {
+      setFollowers(user.followersCount);
+    }
+  }, [user]);
+
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const limit = 20;
 
@@ -84,9 +93,13 @@ export default function UserProfile() {
         </div>
       </div>
       <div className="mt-12 flex gap-2">
-        <Button className="px-40 py-6 bg-[#4A5DF9] hover:bg-[#4A5DF9]/90 text-white rounded rounded-xl font-semibold">
-          {user.isFollowing ? "Following" : "Follow"}
-        </Button>
+        <FollowButton
+          userId={user._id}
+          initialFollowing={!user.isFollowing}
+          onChange={(followed: boolean) => {
+            setFollowers((f) => (followed ? f + 1 : f - 1));
+          }}
+        />
         <Button className="px-40 py-6 bg-[#333333] hover:bg-[#333333]/90 text-white rounded rounded-xl font-semibold">
           Message
         </Button>
@@ -154,9 +167,9 @@ export default function UserProfile() {
           return (
             <div
               key={post._id}
-              onClick={() => 
+              onClick={() =>
                 navigate(`/posts/${post._id}`, {
-                  state: {backgroundLocation: location}
+                  state: { backgroundLocation: location },
                 })
               }
               className="aspect-square overflow-hidden bg-black"

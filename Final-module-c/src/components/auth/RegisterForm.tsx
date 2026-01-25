@@ -33,9 +33,10 @@ export default function RegisterForm() {
     };
 
     try {
-      const result = await registerApi(payload);
+      const { data } = await registerApi(payload);
+      console.log("Register response:", data);
       setSuccessMessage(
-        "Sign up successful! Please check your email to verify your account."
+        "Sign up successful!"
       );
     } catch (error: any) {
       setServerError(error.response?.data?.message || "Register failed");

@@ -11,7 +11,7 @@ export default function Sidebar() {
   const { collapsed } = useSidebar();
   const profile = useSelector((state: any) => state.auth.profile);
 
-  const [openCreate, setOpenCreate] = useState(false);
+  const [, setOpenCreate] = useState(false);
 
   return (
     <div
