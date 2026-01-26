@@ -1,17 +1,8 @@
 import { useState } from "react";
 import axiosClient from "@/api/profile/axiosClient";
+import type { FollowButtonProps } from "@/types/users/followUserType";
 
-interface FollowButtonProps {
-  userId: string;
-  initialFollowing: boolean;
-  onChange?: (followed: boolean) => void;
-}
-
-export default function FollowButton({
-  userId,
-  initialFollowing,
-  onChange,
-}: FollowButtonProps) {
+export default function FollowButton({userId, initialFollowing, onChange,}: FollowButtonProps) {
   const [isFollowing, setIsFollowing] = useState<boolean>(initialFollowing);
   const [loading, setLoading] = useState(false);
 
