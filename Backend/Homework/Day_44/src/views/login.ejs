@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <form method="post" action="/login" class="w-[500px] m-auto mt-24 border border-1 p-5 rounded rounded-lg">
+        <h1 class="font-bold text-2xl mb-5 text-center">Login</h1>
+
+        <% if (error) { %>
+            <p class="p-3 mb-3 rounded rounded-md text-gray-600 bg-red-200"><%= error %> </p>
+        <% } %>
+        <% if (message) { %>
+            <p class="p-3 mb-3 rounded rounded-md text-gray-600 bg-green-200"><%= message %> </p>
+        <% } %>
+
+        <div class="mb-3">
+            <label for="">Email</label><br>
+            <input type="email" name="email" 
+                class="form-control w-full border rounded rounded-md p-2" placeholder="Email..">
+        </div>
+        <div class="mb-5">
+            <label for="">Password</label><br>
+            <input type="password" name="password" 
+                class="form-control w-full border rounded rounded-md p-2" placeholder="Password..">
+        </div>
+        <button class="btn btn-primary w-full bg-[#4A5DF9] px-3 py-2 rounded rounded-md text-white" type="submit">Login</button>
+    </form>
+
+    <div class=" w-[300px] m-auto mt-24 border border-1 rounded rounded-lg text-center text-[#dddddd]">
+        <p>admin@gmail.com</p>
+        <p>123456</p>
+    </div>
+</body>
+</html>
