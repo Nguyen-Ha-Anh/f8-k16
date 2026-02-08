@@ -3,13 +3,15 @@ import RightSidebar from "@/layout/sidebar/RightSidebar";
 
 export default function Home() {
   return (
-    <div className="flex gap-8 pt-8">
-      <div className="w-[470px]">
-        <Feed />
-      </div>
+    <div>
+      <div className="mx-auto flex justify-between max-w-[780px] pt-8">
+        <div className="w-[470px]">
+          <Feed />
+        </div>
 
-      <div className="hidden lg:block w-[320px] pl-32">
-        <RightSidebar/>
+        <div className="fixed top-3 right-13 h-screen w-[320px] hidden lg:block">
+          <RightSidebar />
+        </div>
       </div>
     </div>
   );

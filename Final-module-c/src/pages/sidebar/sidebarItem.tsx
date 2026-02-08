@@ -4,17 +4,33 @@ import type { SidebarItemProps } from "@/types/FeedType";
 import { useSidebar } from "@/context/SidebarContext";
 
 export default function SidebarItem(props: SidebarItemProps) {
-  const { toggleSearch, collapsed, toggleNotification } = useSidebar();
-  
+  const {
+    toggleSearch,
+    collapsed,
+    toggleNotification,
+    searchOpen,
+    notificationOpen,
+  } = useSidebar();
+
+  const isPanelOpen = searchOpen || notificationOpen;
+
   if (props.type === "action") {
     const Icon = props.icon;
+
+    const isActive =
+      (props.action === "search" && searchOpen) ||
+      (props.action === "notification" && notificationOpen);
+
     return (
       <button
         onClick={() => {
           if (props.action === "search") toggleSearch();
           if (props.action === "notification") toggleNotification();
         }}
-        className="flex items-center gap-4 p-2 rounded-lg transition w-full"
+        className={`
+        flex items-center gap-4 p-2 rounded-lg transition w-full
+        ${isActive ? "bg-accent font-semibold" : ""}
+      `}
       >
         {Icon && <Icon size={24} />}
         {!collapsed && <span>{props.label}</span>}
@@ -39,7 +55,7 @@ export default function SidebarItem(props: SidebarItemProps) {
       to={path}
       className={({ isActive }) =>
         `flex items-center gap-4 p-2 rounded-lg transition
-     ${isActive ? "bg-accent font-semibold" : ""}`
+        ${isActive && !isPanelOpen ? "bg-accent font-semibold" : ""}`
       }
     >
       {({ isActive }) => (

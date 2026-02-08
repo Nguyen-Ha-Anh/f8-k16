@@ -24,7 +24,7 @@ export default function RightSidebar() {
 
   return (
     <div className="hidden xl:block w-[320px] px-4 pt-8">
-      <div className="flex items-center justify-between mb-6">
+      <NavLink to={`/profile`} className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <img
             src={getAvatar(profile)}
@@ -40,7 +40,7 @@ export default function RightSidebar() {
           </div>
         </div>
         <button className="text-blue-500 text-sm font-semibold">Switch</button>
-      </div>
+      </NavLink>
 
       {/* title */}
       <div className="flex justify-between mb-3">
@@ -58,7 +58,7 @@ export default function RightSidebar() {
             <div className="flex items-center gap-3">
               <img
                 src={getAvatar(user)}
-                className="w-9 h-9 rounded-full object-cover"
+                className="w-11 h-11 rounded-full object-cover"
               />
               <div className="leading-tight">
                 <p className="text-sm font-semibold">{user.username}</p>
@@ -66,7 +66,7 @@ export default function RightSidebar() {
               </div>
             </div>
             <button 
-              className="text-blue-500 text-xs font-semibold"
+              className="text-blue-500 text-sm font-semibold"
               onClick={(e) => e.preventDefault()}>
               Follow
             </button>
@@ -76,7 +76,7 @@ export default function RightSidebar() {
 
       {/* footer */}
       <div className="mt-10 text-xs text-gray-500 space-y-2">
-        <p>About · Help · Press · API · Jobs · Privacy · Terms</p>
+        <p className="hover:underline">About · Help · Press · API · Jobs · Privacy · Terms</p>
         <p>© 2026 INSTAGRAM FROM META</p>
       </div>
     </div>

@@ -2,11 +2,12 @@ import { Heart } from "lucide-react";
 import { useLikePost } from "@/hooks/useLikePost";
 import type { LikeProps } from "@/types/posts/likeType";
 
-export default function LikeButton({postId, initialLikes, size = 20}: LikeProps) {
+export default function LikeButton({postId, initialLikes, size = 20, initialLiked}: LikeProps) {
   const { likes, liked, handleToggleLike, loading } =
     useLikePost({
       postId,
       initialLikes,
+      initialLiked
     });
 
   return (

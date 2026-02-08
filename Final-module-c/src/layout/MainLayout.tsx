@@ -7,7 +7,7 @@ import MessageBubble from "./MessageBubble";
 
 export default function MainLayout() {
   const { searchOpen, notificationOpen, collapsed } = useSidebar();
-  const baseMargin = collapsed ? 59 : 240;
+  const sidebarWidth = collapsed ? 59 : 240;
   const panelWidth = searchOpen || notificationOpen ? 400 : 0;
 
   return (
@@ -19,17 +19,15 @@ export default function MainLayout() {
 
       <main
         style={{
-          marginLeft: baseMargin + panelWidth + 60,
+          marginLeft: sidebarWidth + panelWidth,
         }}
         className={`
           min-h-screen
-          flex justify-center
-          ${collapsed ? "ml-[59px]" : "ml-[240px]"}
         `}
       >
-        <div className="w-full max-w-[1900px] px-6">
+        {/* <div className="w-full max-w-[1900px] px-6"> */}
           <Outlet />
-        </div>
+        {/* </div> */}
       </main>
 
       <MessageBubble/>

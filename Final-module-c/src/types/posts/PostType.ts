@@ -24,6 +24,8 @@ export type Post = {
     profilePicture?: string | null;
   } 
   likes: number;
+  isLiked: boolean;
+
   comments: number;
   createdAt: string;
   mediaType?: 'image' | 'video'

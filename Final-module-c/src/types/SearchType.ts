@@ -10,4 +10,5 @@ export type SidebarContextType = {
   // openNotification: () => void;
   // closeNotification: () => void;
   toggleNotification: () => void;
+  closePanels: () => void;
 };

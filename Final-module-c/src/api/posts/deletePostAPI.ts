@@ -4,3 +4,4 @@ export const deletePost = async (postId: string) => {
   const res = await axiosClient.delete(`/posts/${postId}`);
   return res.data;
 };
+

@@ -8,16 +8,6 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const [notificationOpen, setNotificationOpen] = useState(false);
   const collapsed = searchOpen || notificationOpen
 
-  // const openSearch = () => {
-  //   setCollapsed(true);
-  //   setSearchOpen(true);
-  // };
-
-  // const closeSearch = () => {
-  //   setCollapsed(false);
-  //   setSearchOpen(false);
-  // };
-
   const toggleSearch = () => {
     setSearchOpen((prev) => {
       const next = !prev;
@@ -26,23 +16,17 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  // const openNotification = () => {
-  //   setCollapsed(true);
-  //   setNotificationOpen(true);
-  //   setSearchOpen(false);
-  // };
-
-  // const closeNotification = () => {
-  //   setNotificationOpen(false);
-  //   setCollapsed(false);
-  // };
-
   const toggleNotification = () => {
     setNotificationOpen((prev) => {
       const next = !prev;
       if (next) setSearchOpen(false);
       return next;
     });
+  };
+
+  const closePanels = () => {
+    setSearchOpen(false);
+    setNotificationOpen(false);
   };
 
   return (
@@ -57,6 +41,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
         // openNotification,
         // closeNotification,
         toggleNotification,
+        closePanels
       }}
     >
       {children}

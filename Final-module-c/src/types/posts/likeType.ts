@@ -6,5 +6,6 @@ export type LikeParams = {
 export type LikeProps = {
   postId: string;
   initialLikes: number;
+  initialLiked: boolean;
   size?: number;
 };

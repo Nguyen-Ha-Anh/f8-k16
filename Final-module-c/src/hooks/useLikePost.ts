@@ -2,19 +2,14 @@ import { useState, useEffect } from "react";
 import { unlikePost } from "@/api/posts/likePostAPI";
 import { likePost } from "@/api/posts/postAPI";
 
-export function useLikePost({postId, initialLikes}: {
+export function useLikePost({postId, initialLikes, initialLiked}: {
   postId: string;
   initialLikes: number;
+  initialLiked: boolean
 }) {
   const [likes, setLikes] = useState(initialLikes);
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState(initialLiked);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const saved = localStorage.getItem(`liked_${postId}`);
-    setLiked(saved === "true");
-    setLikes(initialLikes);
-  }, [postId, initialLikes]);
 
   const handleToggleLike = async () => {
     if (loading) return;
@@ -26,7 +21,7 @@ export function useLikePost({postId, initialLikes}: {
 
       // UI 
       setLiked(nextLiked);
-      localStorage.setItem(`liked_${postId}`, String(nextLiked));
+      setLikes((prev) => prev + (nextLiked ? 1 : -1))
 
       const data = nextLiked
         ? await likePost(postId)
@@ -38,7 +33,7 @@ export function useLikePost({postId, initialLikes}: {
     } catch {
       // rollback UI
       setLiked(liked);
-      localStorage.setItem(`liked_${postId}`, String(liked));
+      setLikes((prev) => prev + (liked ? 1 : -1))
     } finally {
       setLoading(false);
     }

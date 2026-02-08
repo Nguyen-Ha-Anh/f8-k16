@@ -73,7 +73,11 @@ export default function PostItem({ post }: { post: Post }) {
       <div className="flex gap-4 justify-between items-center select-none">
         <div className="flex mb-2 gap-3">
           <div className="flex mt-3 text-xl items-center">
-            <LikeButton postId={post._id} initialLikes={post.likes || 0} />
+            <LikeButton 
+              postId={post._id} 
+              initialLikes={post.likes || 0} 
+              initialLiked={post.isLiked}
+            />
           </div>
           <div className="flex gap-1 mt-3 text-xl items-center">
             <MessageCircle />
