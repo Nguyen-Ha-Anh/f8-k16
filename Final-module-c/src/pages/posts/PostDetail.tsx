@@ -15,6 +15,7 @@ export default function PostDetail() {
   const [post, setPost] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [comment, setComment] = useState("");
+  const [error, setError] = useState(false);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -51,6 +52,8 @@ export default function PostDetail() {
     if (!postId) return;
 
     setLoading(true);
+    setError(false);
+
     getPostDetail(postId)
       .then((postData) => {
         console.log("raw", postData);
@@ -59,12 +62,31 @@ export default function PostDetail() {
         setPost(postData);
         setNewCaption(postData.caption || "");
       })
+      .catch(() => {
+        setError(true);
+        setPost(null);
+      })
       .finally(() => setLoading(false));
   }, [postId]);
 
   if (loading) return <p className="p-10">Loading post...</p>;
-  if (!post) return <p className="p-10 text-red-500">Post not found</p>;
-  if (!post.user) return <p className="p-10 text-red-500">User missing</p>;
+  if (error || !post) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+        <div className="bg-background rounded-xl p-8 text-center space-y-4">
+          <p className="text-gray-500 text-sm">
+            Post not found
+          </p>
+          <button
+            onClick={() => navigate(-1)}
+            className="px-4 py-2 rounded-lg bg-muted hover:bg-muted/80 text-sm"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const media =
     post.mediaType === "image"
@@ -187,6 +209,7 @@ export default function PostDetail() {
               <LikeButton
                 postId={post._id}
                 initialLikes={post.likes}
+                initialLiked={post.isLiked}
               />
               <span className="text-sm">
                 <b>{post.likes}</b> likes

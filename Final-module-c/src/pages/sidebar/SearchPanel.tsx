@@ -2,6 +2,14 @@ import { searchUsers } from "@/api/search/searchAPI";
 import type { UserProfile } from "@/types/users/userType";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  getRecentSearches,
+  addRecentSearch,
+  type RecentSearch,
+  deleteRecentSearch,
+} from "@/utils/recentSearch";
+import { X } from "lucide-react";
+import { getAvatar } from "@/utils/getAvatar";
 
 export default function SearchPanel() {
   const [query, setQuery] = useState("");
@@ -9,6 +17,12 @@ export default function SearchPanel() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+
+  const [recentSearches, setRecentSearches] = useState<RecentSearch[]>([]);
+
+  useEffect(() => {
+    setRecentSearches(getRecentSearches());
+  }, []);
 
   useEffect(() => {
     if (!query) {
@@ -57,16 +71,70 @@ export default function SearchPanel() {
         <p className="text-sm text-gray-400">No results found</p>
       )}
 
+      {!query && recentSearches.length > 0 && (
+        <>
+          <p className="mb-2 text-sm font-semibold">Recent</p>
+
+          {recentSearches.map((user) => (
+            <div
+              key={user._id}
+              className="flex items-center justify-between gap-3 p-2 hover:bg-accent rounded"
+            >
+              {/* click user */}
+              <div
+                onClick={() => navigate(`/profile/${user._id}`)}
+                className="flex items-center gap-3 cursor-pointer"
+              >
+                <img
+                  src={getAvatar(user)}
+                  onError={(e) => (e.currentTarget.src = "/avaauto.jpg")}
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+                <div>
+                  <p className="font-semibold">{user.username}</p>
+                  <p className="text-sm text-gray-400">{user.fullName}</p>
+                </div>
+              </div>
+
+              {/* delete button */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deleteRecentSearch(user._id);
+                  setRecentSearches(getRecentSearches());
+                }}
+                className="text-gray-400 text-sm cursor-pointer"
+              >
+                <X />
+              </button>
+            </div>
+          ))}
+        </>
+      )}
+
       <div className="flex-1 overflow-y-auto">
         {results.map((user) => (
           <div
             key={user._id}
-            onClick={() => navigate(`/profile/${user._id}`)}
+            onClick={() => {
+              addRecentSearch({
+                _id: user._id,
+                username: user.username,
+                fullName: user.fullName,
+                profilePicture: user.profilePicture,
+              });
+
+              setRecentSearches(getRecentSearches());
+              navigate(`/profile/${user._id}`);
+            }}
             className="flex items-center gap-3 p-2 hover:bg-accent rounded cursor-pointer"
           >
             <img
-              src={user.profilePicture || "/avaauto.jpg"}
+              src={getAvatar(user)}
               alt={user.username}
+              onError={(e) => {
+                e.currentTarget.src = "/avaauto.jpg";
+              }}
               className="w-10 h-10 rounded-full object-cover"
             />
             <div className="flex flex-col">

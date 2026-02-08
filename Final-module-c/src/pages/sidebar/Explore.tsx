@@ -24,13 +24,25 @@ export default function Explore() {
     setLoading(true);
     try {
       const postsData = await getExplorePosts(page, 20);
+      const cleanPosts = postsData.posts.filter((p) => p.image || p.video);
 
-      setPosts((prev) => [...prev, ...postsData.posts]);
+      setPosts((prev) =>
+        page === 1 ? cleanPosts : [...prev, ...cleanPosts],
+      );
       setPagination(postsData.pagination);
     } finally {
       setLoading(false);
     }
   };
+
+  const removePost = (postId: string) => {
+    setPosts((prev) => prev.filter((p) => p._id !== postId));
+  };
+
+  useEffect(() => {
+    setPage(1);
+    setPosts([]);
+  }, []);
 
   useEffect(() => {
     fetchExplore();
@@ -49,15 +61,17 @@ export default function Explore() {
               <img
                 src={resolveMedia(post.image)}
                 className="w-full h-full object-cover"
+                onError={() => removePost(post._id)}
               />
             ) : (
               <video
                 src={resolveMedia(post.video)}
                 className="w-full h-full object-cover"
+                onError={() => removePost(post._id)}
               />
             )}
 
-            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-6 text-white transition pointer-events-none">
+            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-6 text-white transition">
               <p className="flex gap-2">
                 <Heart />
                 {post.likes}

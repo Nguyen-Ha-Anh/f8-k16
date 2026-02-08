@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { unlikePost } from "@/api/posts/likePostAPI";
 import { likePost } from "@/api/posts/postAPI";
 
