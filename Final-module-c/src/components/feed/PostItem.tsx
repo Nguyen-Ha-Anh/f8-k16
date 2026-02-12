@@ -1,9 +1,15 @@
+import { deletePost } from "@/api/posts/postAPI";
 import { useAutoPlayVideo } from "@/hooks/useAutoPlayVideo";
+import ConfirmDeleteModal from "@/pages/posts/ConfirmDeleteModal";
+import EditCaption from "@/pages/posts/EditCaption";
 import LikeButton from "@/pages/posts/LikeButton";
+import PostMenu from "@/pages/posts/PostMenu";
 import SaveButton from "@/pages/posts/saveButton";
 import type { Post } from "@/types/posts/PostType";
+import { formatTimeAgo } from "@/utils/formatTimeAgo";
 import { getAvatar } from "@/utils/getAvatar";
 import { MessageCircle, Repeat2, Send } from "lucide-react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function PostItem({ post }: { post: Post }) {
@@ -12,6 +18,11 @@ export default function PostItem({ post }: { post: Post }) {
   const navigate = useNavigate();
 
   const videoRef = useAutoPlayVideo();
+
+  const [editing, setEditing] = useState(false);
+
+  //confirm delete
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const imageUrl = post.image
     ? post.image.startsWith("http")
@@ -29,28 +40,40 @@ export default function PostItem({ post }: { post: Post }) {
 
   return (
     <div className="border-b border-zinc-800 pb-6">
-      <div
-        className="flex items-center gap-3 mb-3 cursor-pointer"
-        onClick={() => {
-          console.log("navigate:", user?._id);
-          if (user?._id) {
-            navigate(`/profile/${user._id}`);
-          }
-        }}
-      >
-        <img
-          src={getAvatar(user)}
-          onError={(e) => {
-            e.currentTarget.src = "/avaauto.jpg";
+      <div className="flex items-center justify-between mb-2">
+        <div
+          className="flex items-center gap-3 cursor-pointer"
+          onClick={() => {
+            console.log("navigate:", user?._id);
+            if (user?._id) {
+              navigate(`/profile/${user._id}`);
+            }
           }}
-          className="w-8 h-8 rounded-full"
+        >
+          <img
+            src={getAvatar(user)}
+            onError={(e) => {
+              e.currentTarget.src = "/avaauto.jpg";
+            }}
+            className="w-8 h-8 rounded-full"
+          />
+          <span className="font-semibold text-sm">
+            {user?.username || "unknown"}
+          </span>
+          <span className="text-zinc-400 text-xs">
+            {post.createdAt ? formatTimeAgo(post.createdAt) : ""}
+          </span>
+        </div>
+
+        <PostMenu
+          postUserId={user._id}
+          onDelete={() => {
+            setShowDeleteConfirm(true);
+          }}
+          onEdit={() => {
+            setEditing(true);
+          }}
         />
-        <span className="font-semibold text-sm">
-          {user?.username || "unknown"}
-        </span>
-        <span className="text-zinc-400 text-xs">
-          {post.createdAt ? new Date(post.createdAt).toLocaleDateString() : ""}
-        </span>
       </div>
 
       {/* image | video */}
@@ -73,9 +96,9 @@ export default function PostItem({ post }: { post: Post }) {
       <div className="flex gap-4 justify-between items-center select-none">
         <div className="flex mb-2 gap-3">
           <div className="flex mt-3 text-xl items-center">
-            <LikeButton 
-              postId={post._id} 
-              initialLikes={post.likes || 0} 
+            <LikeButton
+              postId={post._id}
+              initialLikes={post.likes || 0}
               initialLiked={post.isLiked}
             />
           </div>
@@ -91,23 +114,44 @@ export default function PostItem({ post }: { post: Post }) {
           </div>
         </div>
 
-        <SaveButton postId={post._id} initialSaved={false} />
+        <SaveButton postId={post._id} initialSaved={post.isSaved} />
       </div>
 
       {/* caption */}
-      <p className="text-sm">
-        <span
-          onClick={() => {
-            if (user?._id) {
-              navigate(`/profile/${user._id}`);
-            }
+      {editing ? (
+        <EditCaption
+          postId={post._id}
+          initialCaption={post.caption}
+          onCancel={() => setEditing(false)}
+          onSaved={(newCaption) => {
+            post.caption = newCaption;
+            setEditing(false);
           }}
-          className="font-semibold cursor-pointer"
-        >
-          {user?.username || "unknown"}
-        </span>{" "}
-        {post.caption}
-      </p>
+        />
+      ) : (
+        <p className="text-sm">
+          <span
+            onClick={() => {
+              if (user?._id) {
+                navigate(`/profile/${user._id}`);
+              }
+            }}
+            className="font-semibold cursor-pointer"
+          >
+            {user?.username || "unknown"}
+          </span>{" "}
+          {post.caption}
+        </p>
+      )}
+
+      <ConfirmDeleteModal
+        open={showDeleteConfirm}
+        onCancel={() => setShowDeleteConfirm(false)}
+        onConfirm={async () => {
+          await deletePost(post._id);
+          setShowDeleteConfirm(false);
+        }}
+      />
     </div>
   );
 }

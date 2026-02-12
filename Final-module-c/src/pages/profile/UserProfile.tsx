@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import type { UserProfile } from "@/types/users/userType";
 import { getUserById } from "@/api/users/userAPI";
 import { getUserPosts } from "@/api/posts/userPostsAPI";
-import { Bookmark, Clapperboard, Grid } from "lucide-react";
+import { Bookmark, Clapperboard, Grid, Video } from "lucide-react";
 import { resolveMedia } from "@/utils/resolveMedia";
 import FollowButton from "../follow/FollowButton";
 
@@ -76,6 +76,7 @@ export default function UserProfile() {
 
         <div>
           <h2 className="text-2xl font-semibold">{user.username}</h2>
+          <p className="mt-3">{user.fullName}</p>
 
           <div className="flex gap-6 mt-3">
             <span>
@@ -172,16 +173,25 @@ export default function UserProfile() {
                   state: { backgroundLocation: location },
                 })
               }
-              className="aspect-square overflow-hidden bg-black"
+              className="aspect-square overflow-hidden bg-black relative cursor-pointer"
             >
               {post.mediaType === "image" ? (
                 <img src={media} className="w-full h-full object-cover" />
               ) : (
-                <video
-                  src={media}
-                  className="w-full h-full object-cover"
-                  muted
-                />
+                <>
+                  <video
+                    src={media}
+                    autoPlay
+                    muted
+                    preload="metadata"
+                    playsInline
+                    className="w-full h-full object-cover"
+                  />
+
+                  <div className="absolute top-2 right-2 bg-black/60 rounded-full p-1">
+                    <Video size={20} className="text-white fill-white" />
+                  </div>
+                </>
               )}
             </div>
           );

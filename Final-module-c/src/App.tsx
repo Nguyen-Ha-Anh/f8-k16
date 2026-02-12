@@ -16,10 +16,22 @@ import EditProfile from "./pages/profile/EditProfile";
 import UserProfile from "./pages/profile/UserProfile";
 import PostDetail from "./pages/posts/PostDetail";
 import Create from "./pages/sidebar/create/Create";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { fetchProfile } from "./store/authSlice";
+import ProtectedRoute from "./routes/ProtectedRoute";
 
 export default function App() {
   const location = useLocation();
   const state = location.state as { backgroundLocation?: Location };
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      dispatch(fetchProfile() as any);
+    }
+  }, []);
 
   return (
     <SidebarProvider>
@@ -30,7 +42,13 @@ export default function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-        <Route element={<AppLayout />}>
+        <Route
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route path="posts/:postId" element={<PostDetail />} />
           <Route path="home" element={<Home />} />
           <Route path="explore" element={<Explore />} />

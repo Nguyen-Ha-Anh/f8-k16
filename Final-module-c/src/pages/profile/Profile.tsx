@@ -1,5 +1,12 @@
 import { useDispatch, useSelector } from "react-redux";
-import { Settings, Grid, Bookmark, UserSquare2, Camera } from "lucide-react";
+import {
+  Settings,
+  Grid,
+  Bookmark,
+  UserSquare2,
+  Camera,
+  Video,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getAvatar } from "@/utils/getAvatar";
 import { useEffect, useState } from "react";
@@ -17,7 +24,6 @@ export default function Profile() {
   const [activeTab, setActiveTab] = useState<"posts" | "saved" | "tagged">(
     "posts",
   );
-  const [filter, setFilter] = useState<"all" | "saved" | "tagged">("all");
   const [page, setPage] = useState(0);
 
   const [savedPosts, setSavedPosts] = useState<Post[]>([]);
@@ -25,50 +31,30 @@ export default function Profile() {
   const limit = 20;
 
   useEffect(() => {
+    if (activeTab === "saved") {
+      setPage(0); // reset page
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
     if (!profile?._id) return;
 
-    const offset = page * limit;
+    let url =
+      activeTab === "saved" ? `/posts/saved` : `/posts/user/${profile._id}`;
 
-    let url = "";
+    const config =
+      activeTab === "saved" ? {} : { params: { limit, offset: page * limit } };
 
-    if (filter === "saved") {
-      url = `/posts/saved`;
-    } else {
-      url = `/posts/user/${profile._id}`;
-    }
+    axiosClient.get(url, config).then((res) => {
+      const list = res.data?.data?.posts || res.data?.data || [];
 
-    axiosClient
-      .get(url, {
-        params: {
-          limit,
-          offset,
-        },
-      })
-      .then((res) => {
-        const raw = res.data?.data;
-
-        const list = Array.isArray(raw)
-          ? raw
-          : Array.isArray(raw?.posts)
-            ? raw.posts
-            : [];
-
-        if (filter === "saved") {
-          if (page === 0) {
-            setSavedPosts(list);
-          } else {
-            setSavedPosts((prev) => [...prev, ...list]);
-          }
-        } else {
-          if (page === 0) {
-            setPosts(list);
-          } else {
-            setPosts((prev) => [...prev, ...list]);
-          }
-        }
-      })
-      .catch(() => setPosts([]));
-  }, [profile, filter, page]);
+      if (activeTab === "saved") {
+        setSavedPosts(list);
+      } else {
+        setPosts(list);
+      }
+    });
+  }, [profile?._id, activeTab, page]);
 
   useEffect(() => {
     if (!profile) {
@@ -90,10 +76,10 @@ export default function Profile() {
             />
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-2">
             <div className="flex items-center gap-2">
               <h2 className="text-2xl font-semibold">
-                {profile?.fullName || profile?.username || "username"}
+                {profile?.username || "username"}
               </h2>
 
               <Settings
@@ -101,6 +87,8 @@ export default function Profile() {
                 className="cursor-pointer hover:text-muted-foreground"
               />
             </div>
+
+            <p>{profile?.fullName}</p>
 
             <div className="flex gap-8 text-sm">
               <span>
@@ -114,13 +102,13 @@ export default function Profile() {
               </span>
             </div>
 
-            <div className="text-sm text-muted-foreground">
+            <p className="mt-6 text-sm text-foreground whitespace-pre-line">
               {profile?.bio || ""}
-            </div>
+            </p>
           </div>
         </div>
 
-        <div className="flex gap-2 mt-10">
+        <div className="flex gap-2 mt-6">
           <Button
             variant="secondary"
             size="lg"
@@ -140,7 +128,6 @@ export default function Profile() {
             <div
               onClick={() => {
                 setActiveTab("posts");
-                setFilter("all");
                 setPage(0);
               }}
               className={`flex items-center gap-2 pt-4 cursor-pointer transition
@@ -156,8 +143,8 @@ export default function Profile() {
 
             <div
               onClick={() => {
+                console.log("CLICK SAVED");
                 setActiveTab("saved");
-                setFilter("saved");
                 setPage(0);
               }}
               className={`flex items-center gap-2 pt-4 cursor-pointer transition
@@ -174,7 +161,6 @@ export default function Profile() {
             <div
               onClick={() => {
                 setActiveTab("tagged");
-                setFilter("tagged");
                 setPage(0);
               }}
               className={`flex items-center gap-2 pt-4 cursor-pointer transition
@@ -209,17 +195,51 @@ export default function Profile() {
         ) : (
           <div className="grid grid-cols-3 gap-1 mt-10">
             {data.map((post) => {
-              const img = post.image?.startsWith("http")
-                ? post.image
-                : `https://instagram.f8team.dev${post.image}`;
+              console.log("post:", post);
+
+              const videoUrl = post.video
+                ? post.video.startsWith("http")
+                  ? post.video
+                  : `https://instagram.f8team.dev${post.video}`
+                : "";
+
+              const img = post.image
+                ? post.image.startsWith("http")
+                  ? post.image
+                  : `https://instagram.f8team.dev${post.image}`
+                : "/post-placeholder.jpg";
+
+              const thumbnail = post.thumbnail
+                ? post.thumbnail.startsWith("http")
+                  ? post.thumbnail
+                  : `https://instagram.f8team.dev${post.thumbnail}`
+                : "/video-placeholder.jpg";
 
               return (
-                <div key={post._id} className="aspect-square overflow-hidden">
-                  <img
-                    src={img}
-                    onClick={() => navigate(`/posts/${post._id}`)}
-                    className="w-full h-full object-cover hover:opacity-80 cursor-pointer"
-                  />
+                <div
+                  key={post._id}
+                  className="aspect-square overflow-hidden relative cursor-pointer"
+                  onClick={() => navigate(`/posts/${post._id}`)}
+                >
+                  {post.mediaType === "video" ? (
+                    <>
+                      <video
+                        src={videoUrl}
+                        poster={thumbnail}
+                        autoPlay
+                        muted
+                        preload="metadata"
+                        playsInline
+                        className="w-full h-full object-cover"
+                      />
+
+                      <div className="absolute top-2 right-2 bg-black/60 rounded-full p-1">
+                        <Video size={16} className="text-white fill-white" />
+                      </div>
+                    </>
+                  ) : (
+                    <img src={img} className="w-full h-full object-cover" />
+                  )}
                 </div>
               );
             })}

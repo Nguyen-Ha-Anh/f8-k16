@@ -11,7 +11,7 @@ export default function MainLayout() {
   const panelWidth = searchOpen || notificationOpen ? 400 : 0;
 
   return (
-    <div className="h-screen bg-background text-foreground">
+    <div className="flex h-screen bg-background text-foreground">
       <Sidebar />
 
       {searchOpen && <SearchPanel />}
@@ -22,7 +22,8 @@ export default function MainLayout() {
           marginLeft: sidebarWidth + panelWidth,
         }}
         className={`
-          min-h-screen
+          flex-1
+          overflow-y-auto
         `}
       >
         {/* <div className="w-full max-w-[1900px] px-6"> */}

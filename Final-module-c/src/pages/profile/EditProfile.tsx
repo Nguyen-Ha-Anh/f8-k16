@@ -193,12 +193,12 @@ export default function EditProfile() {
             <label className="text-sm font-medium">Bio</label>
             <Textarea
               value={bio}
-              maxLength={150}
+              maxLength={250}
               onChange={(e) => setBio(e.target.value)}
               placeholder="Bio"
             />
             <p className="text-xs text-muted-foreground text-right">
-              {bio.length}/150
+              {bio.length}/250
             </p>
           </div>
 

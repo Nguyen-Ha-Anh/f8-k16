@@ -10,6 +10,7 @@ export default function SidebarItem(props: SidebarItemProps) {
     toggleNotification,
     searchOpen,
     notificationOpen,
+    closePanels
   } = useSidebar();
 
   const isPanelOpen = searchOpen || notificationOpen;
@@ -28,7 +29,7 @@ export default function SidebarItem(props: SidebarItemProps) {
           if (props.action === "notification") toggleNotification();
         }}
         className={`
-        flex items-center gap-4 p-2 rounded-lg transition w-full
+        flex items-center gap-4 p-2 rounded-lg transition w-full cursor-pointer
         ${isActive ? "bg-accent font-semibold" : ""}
       `}
       >
@@ -53,6 +54,7 @@ export default function SidebarItem(props: SidebarItemProps) {
   return (
     <NavLink
       to={path}
+      onClick={closePanels}
       className={({ isActive }) =>
         `flex items-center gap-4 p-2 rounded-lg transition
         ${isActive && !isPanelOpen ? "bg-accent font-semibold" : ""}`

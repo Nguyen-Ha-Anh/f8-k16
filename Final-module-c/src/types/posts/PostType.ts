@@ -28,6 +28,7 @@ export type Post = {
 
   comments: number;
   createdAt: string;
+  thumbnail?: string; 
   mediaType?: 'image' | 'video'
 
   isSaved?: boolean;

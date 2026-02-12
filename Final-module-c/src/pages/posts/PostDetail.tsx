@@ -1,13 +1,17 @@
-import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { MoreHorizontal, Send, X } from "lucide-react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Heart, MoreHorizontal, X } from "lucide-react";
 import { resolveMedia } from "@/utils/resolveMedia";
 import { getPostDetail } from "@/api/posts/postDetailAPI";
 import { getAvatar } from "@/utils/getAvatar";
 import { useSelector } from "react-redux";
-import axiosClient from "@/api/profile/axiosClient";
-import { deletePost } from "@/api/posts/deletePostAPI";
 import LikeButton from "./LikeButton";
+import PostMenu from "./PostMenu";
+import { deletePost } from "@/api/posts/postAPI";
+import EditCaption from "./EditCaption";
+import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import { formatTimeAgo } from "@/utils/formatTimeAgo";
+import { useComments } from "@/hooks/useComments";
 
 export default function PostDetail() {
   const { postId } = useParams();
@@ -17,36 +21,33 @@ export default function PostDetail() {
   const [comment, setComment] = useState("");
   const [error, setError] = useState(false);
 
-  const [menuOpen, setMenuOpen] = useState(false);
   const [editing, setEditing] = useState(false);
-  const [newCaption, setNewCaption] = useState("");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   //click vao ava thi chuyen qua profile
   const navigate = useNavigate();
+
+  const location = useLocation();
+  const from = location.state?.from || -1;
 
   //edit caption
   const currentUser = useSelector((state: any) => state.auth.profile);
   //neu la post cua minh moi duoc edit
   const isOwner = currentUser?._id === post?.user?._id;
 
-  const handleUpdateCaption = async () => {
-    if (!isOwner) return;
+  const videoRef = useRef<HTMLVideoElement>(null);
 
-    try {
-      const res = await axiosClient.patch(`/posts/${post._id}`, {
-        caption: newCaption,
-      });
+  // comments
+  const [posting, setPosting] = useState(false);
+  const { comments, addComment, fetchComments, hasMore, toggleLike } =
+    useComments(post?._id || "");
+  const commentContainerRef = useRef<HTMLDivElement>(null);
 
-      setPost((prev: any) => ({
-        ...prev,
-        caption: res.data.data.caption,
-      }));
-
-      setEditing(false);
-    } catch (err) {
-      alert("Update failed");
+  useEffect(() => {
+    if (post?.mediaType === "video") {
+      videoRef.current?.play().catch(() => {});
     }
-  };
+  }, [post]);
 
   useEffect(() => {
     if (!postId) return;
@@ -60,7 +61,6 @@ export default function PostDetail() {
         console.log("user field", postData?.user);
 
         setPost(postData);
-        setNewCaption(postData.caption || "");
       })
       .catch(() => {
         setError(true);
@@ -69,14 +69,30 @@ export default function PostDetail() {
       .finally(() => setLoading(false));
   }, [postId]);
 
+  useEffect(() => {
+    const container = commentContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const isBottom =
+        container.scrollHeight - container.scrollTop <=
+        container.clientHeight + 50;
+
+      if (isBottom && hasMore) {
+        fetchComments();
+      }
+    };
+
+    container.addEventListener("scroll", handleScroll);
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, [hasMore, fetchComments]);
+
   if (loading) return <p className="p-10">Loading post...</p>;
   if (error || !post) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
         <div className="bg-background rounded-xl p-8 text-center space-y-4">
-          <p className="text-gray-500 text-sm">
-            Post not found
-          </p>
+          <p className="text-gray-500 text-sm">Post not found</p>
           <button
             onClick={() => navigate(-1)}
             className="px-4 py-2 rounded-lg bg-muted hover:bg-muted/80 text-sm"
@@ -102,7 +118,10 @@ export default function PostDetail() {
     >
       {/* close */}
       <button
-        onClick={() => navigate(-1)}
+        onClick={(e) => {
+          e.stopPropagation();
+          navigate(from);
+        }}
         className="absolute top-4 right-4 text-foreground hover:scale-110 transition cursor-pointer"
       >
         <X />
@@ -119,6 +138,9 @@ export default function PostDetail() {
           ) : (
             <video
               src={media}
+              ref={videoRef}
+              muted
+              playsInline
               controls
               className="max-h-full max-w-full object-contain"
             />
@@ -143,42 +165,32 @@ export default function PostDetail() {
             </div>
 
             {isOwner && (
-              <button
-                onClick={() => setMenuOpen(true)}
-                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition"
-              >
-                <MoreHorizontal size={18} />
-              </button>
+              <PostMenu
+                postUserId={post.user._id}
+                onDelete={() => {
+                  setShowDeleteConfirm(true);
+                }}
+                onEdit={() => {
+                  setEditing(true);
+                }}
+              />
             )}
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 text-sm">
+          <div
+            ref={commentContainerRef}
+            className="flex-1 overflow-y-auto p-4 space-y-3 text-sm"
+          >
             {editing ? (
-              <div className="space-y-2">
-                <textarea
-                  value={newCaption}
-                  onChange={(e) => setNewCaption(e.target.value)}
-                  className="w-full border rounded-lg p-2 text-sm"
-                  rows={3}
-                />
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleUpdateCaption}
-                    className="text-[#85A1FF] text-sm font-semibold"
-                  >
-                    Save
-                  </button>
-                  <button
-                    onClick={() => {
-                      setEditing(false);
-                      setNewCaption(post.caption || "");
-                    }}
-                    className="text-sm text-muted-foreground"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
+              <EditCaption
+                postId={post._id}
+                initialCaption={post.caption}
+                onCancel={() => setEditing(false)}
+                onSaved={(newCaption) => {
+                  setPost((p: any) => ({ ...p, caption: newCaption }));
+                  setEditing(false);
+                }}
+              />
             ) : (
               <p>
                 <b
@@ -191,16 +203,60 @@ export default function PostDetail() {
               </p>
             )}
 
-            {post.comments?.map((c: any) => (
-              <p key={c._id}>
-                <b
-                  onClick={() => navigate(`/profile/${post.user._id}`)}
-                  className="cursor-pointer active:text-[#cccccc]/60 hover:underline"
-                >
-                  {c.user.username}
-                </b>{" "}
-                {c.content}
-              </p>
+            {comments.map((c) => (
+              <div key={c._id} className="flex justify-between">
+                <div className="flex gap-2 mt-3">
+                  <img
+                    src={getAvatar(c.userId) || "/avaauto.jpg"}
+                    className="w-6 h-6 rounded-full"
+                  />
+                  <div className="flex-1">
+                    <div className="text-sm">
+                      <span className="font-semibold mr-2">
+                        {c.userId?.username}
+                      </span>
+                      {c.content}
+                    </div>
+
+                    {/* line */}
+                    <div className="flex items-center gap-4 text-xs text-zinc-500 mt-1">
+                      <span>
+                        {c.createdAt ? formatTimeAgo(c.createdAt) : "Now"}
+                      </span>
+
+                      {c.likes > 0 && (
+                        <span className="font-medium">
+                          {c.likes} {c.likes === 1 ? "like" : "likes"}
+                        </span>
+                      )}
+
+                      <button className="hover:text-foreground">Reply</button>
+
+                      <button className="hover:text-foreground">
+                        <MoreHorizontal size={15}/>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 text-xs text-zinc-500 mt-1">
+                  <button
+                    onClick={() => toggleLike(c._id, c.isLiked)}
+                    className="transition transform active:scale-90"
+                  >
+                    <Heart
+                      size={16}
+                      className={`transition ${
+                        c.isLiked
+                          ? "text-red-500 fill-red-500"
+                          : "text-foreground"
+                      }`}
+                    />
+                  </button>
+
+                  {c.likes > 0 && <span>{c.likes}</span>}
+                </div>
+              </div>
             ))}
           </div>
 
@@ -212,9 +268,12 @@ export default function PostDetail() {
                 initialLiked={post.isLiked}
               />
               <span className="text-sm">
-                <b>{post.likes}</b> likes
+                <b>{post.likes}</b>
               </span>
             </div>
+            <p className="text-zinc-400 text-xs mb-3">
+              {post.createdAt ? formatTimeAgo(post.createdAt) : ""}
+            </p>
 
             <div className="flex gap-2">
               <input
@@ -223,60 +282,40 @@ export default function PostDetail() {
                 placeholder="Add a comment..."
                 className="flex-1 bg-transparent border rounded-lg px-3 py-2 text-sm"
               />
-              <button className="text-blue-500 font-semibold flex items-center gap-1">
-                <Send size={16} /> Post
+              <button
+                disabled={posting || !comment.trim()}
+                onClick={async () => {
+                  if (!comment.trim() || posting) return;
+
+                  try {
+                    setPosting(true);
+                    await addComment(comment);
+                    setComment("");
+                  } finally {
+                    setPosting(false);
+                  }
+                }}
+                className={`font-semibold flex items-center gap-1 ${
+                  posting || !comment.trim()
+                    ? "text-gray-600"
+                    : "text-gray-200 hover:underline cursor-pointer"
+                }`}
+              >
+                Post
               </button>
             </div>
           </div>
         </div>
       </div>
-      {/* popup */}
-      {menuOpen && (
-        <div
-          className="fixed inset-0 z-[999] bg-black/50 flex items-center justify-center"
-          onClick={() => setMenuOpen(false)}
-        >
-          <div
-            className="bg-background w-[360px] rounded-xl overflow-hidden shadow-xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* delete */}
-            <button
-              onClick={async () => {
-                if (!confirm("Delete this post?")) return;
-                await deletePost(post._id);
-                navigate(-1);
-              }}
-              className="w-full py-3 text-center text-red-500 font-semibold hover:bg-muted"
-            >
-              Delete
-            </button>
-
-            <div className="h-px bg-border" />
-
-            {/* edit */}
-            <button
-              onClick={() => {
-                setMenuOpen(false);
-                setEditing(true);
-              }}
-              className="w-full py-3 text-center hover:bg-muted"
-            >
-              Edit
-            </button>
-
-            <div className="h-px bg-border" />
-
-            {/* cancel */}
-            <button
-              onClick={() => setMenuOpen(false)}
-              className="w-full py-3 text-center hover:bg-muted"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
+      <ConfirmDeleteModal
+        open={showDeleteConfirm}
+        onCancel={() => setShowDeleteConfirm(false)}
+        onConfirm={async () => {
+          await deletePost(post._id);
+          setShowDeleteConfirm(false);
+          navigate(-1);
+        }}
+      />
     </div>
   );
 }
