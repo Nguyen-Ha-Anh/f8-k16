@@ -1,5 +1,5 @@
 export type User = {
-  _id: number;
+  _id: string;
   username: string;
   fullName: string;
   profilePicture: string;

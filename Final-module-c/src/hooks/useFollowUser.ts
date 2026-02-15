@@ -1,39 +1,51 @@
 import { followUser, unfollowUser } from "@/api/users/followAPI";
-import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setFollowing } from "@/store/followSlice";
+import { useCallback, useState } from "react";
+import { fetchProfile, updateFollowingCount } from "@/store/authSlice";
 
 export function useFollowUser(
   userId: string,
-  initialFollowing = false
+  initialFollowing = false,
+  onChange?: (v: boolean) => void,
+  onSuccess?: () => void,
 ) {
-  const [isFollowing, setIsFollowing] = useState(initialFollowing);
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
 
-  const toggleFollow = async () => {
-    if (loading || !userId) return;
+  const globalFollowing = useSelector(
+    (state: any) => state.follow.followingMap[userId],
+  );
+
+  const isFollowing = globalFollowing ?? initialFollowing;
+
+  const toggleFollow = useCallback(async () => {
+    if (loading) return;
 
     const prev = isFollowing;
     const next = !prev;
 
-    try {
-      setLoading(true);
-      setIsFollowing(next);
+    setLoading(true);
 
-      if (next) {
-        await followUser(userId);
-      } else {
-        await unfollowUser(userId);
-      }
+    dispatch(setFollowing({ userId, value: next }));
+    onChange?.(next);
+
+    const delta = next ? 1 : -1;
+    dispatch(updateFollowingCount(delta));
+
+    try {
+      if (next) await followUser(userId);
+      else await unfollowUser(userId);
+
+      onSuccess?.();
+      dispatch(fetchProfile() as any);
     } catch {
-      setIsFollowing(prev);
-      alert("Follow action failed");
+      dispatch(setFollowing({ userId, value: prev }));
+      onChange?.(prev);
     } finally {
       setLoading(false);
     }
-  };
+  }, [loading, isFollowing, userId]);
 
-  return {
-    isFollowing,
-    loading,
-    toggleFollow
-  };
+  return { isFollowing, loading, toggleFollow };
 }

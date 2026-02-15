@@ -17,8 +17,6 @@ import axiosClient from "@/api/profile/axiosClient";
 
 export default function Profile() {
   const navigate = useNavigate();
-  const profile = useSelector((state: any) => state.auth.profile);
-  const dispatch = useDispatch();
 
   const [posts, setPosts] = useState<Post[]>([]);
   const [activeTab, setActiveTab] = useState<"posts" | "saved" | "tagged">(
@@ -29,6 +27,14 @@ export default function Profile() {
   const [savedPosts, setSavedPosts] = useState<Post[]>([]);
 
   const limit = 20;
+
+  const profile = useSelector((state: any) => state.auth.profile);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchProfile() as any);
+  }, [dispatch]);
 
   useEffect(() => {
     if (activeTab === "saved") {
@@ -56,13 +62,12 @@ export default function Profile() {
     });
   }, [profile?._id, activeTab, page]);
 
-  useEffect(() => {
-    if (!profile) {
-      dispatch(fetchProfile() as any);
-    }
-  }, [dispatch, profile]);
-
   const data = activeTab === "saved" ? savedPosts : posts;
+
+  // follow
+  const [openFollowModal, setOpenFollowModal] = useState<
+    "followers" | "following" | null
+  >(null);
 
   return (
     <div className="min-h-screen bg-background text-foreground pl-[240px]">
@@ -94,11 +99,18 @@ export default function Profile() {
               <span>
                 <b>{posts.length}</b> posts
               </span>
-              <span>
-                <b>{profile?.followers || 0}</b> followers
+              <span
+                className="cursor-pointer"
+                onClick={() => setOpenFollowModal("followers")}
+              >
+                <b>{profile?.followersCount || 0}</b> followers
               </span>
-              <span>
-                <b>{profile?.following || 0}</b> following
+
+              <span
+                className="cursor-pointer"
+                onClick={() => setOpenFollowModal("following")}
+              >
+                <b>{profile?.followingCount || 0}</b> following
               </span>
             </div>
 

@@ -21,13 +21,23 @@ export default function UserProfile() {
     "posts",
   );
 
-  const [, setFollowers] = useState<number>(0);
+  // const [followers, setFollowers] = useState<number>(0);
+
+  const loadUser = async () => {
+    if (!userId) return;
+
+    setLoading(true);
+    try {
+      const data = await getUserById(userId);
+      setUser(data);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    if (user?.followersCount !== undefined) {
-      setFollowers(user.followersCount);
-    }
-  }, [user]);
+    loadUser();
+  }, [userId]);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -83,7 +93,7 @@ export default function UserProfile() {
               <b>{user.postsCount || posts.length}</b> posts
             </span>
             <span>
-              <b>{user.followersCount}</b> followers
+              <b>{user.followersCount ?? 0}</b> followers
             </span>
             <span>
               <b>{user.followingCount}</b> following
@@ -96,12 +106,12 @@ export default function UserProfile() {
       <div className="mt-12 flex gap-2">
         <FollowButton
           userId={user._id}
-          initialFollowing={!user.isFollowing}
-          onChange={(followed: boolean) => {
-            setFollowers((f) => (followed ? f + 1 : f - 1));
+          initialFollowing={user.isFollowing}
+          onChange={() => {
+            loadUser();
           }}
         />
-        <Button className="px-40 py-6 bg-[#333333] hover:bg-[#333333]/90 text-white rounded rounded-xl font-semibold">
+        <Button className="px-40 py-6 bg-[#333333] hover:bg-[#333333]/80 text-white rounded rounded-xl font-semibold">
           Message
         </Button>
       </div>

@@ -12,6 +12,7 @@ import EditCaption from "./EditCaption";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import { formatTimeAgo } from "@/utils/formatTimeAgo";
 import { useComments } from "@/hooks/useComments";
+import type { CommentType } from "@/types/posts/CommentType";
 
 export default function PostDetail() {
   const { postId } = useParams();
@@ -39,9 +40,19 @@ export default function PostDetail() {
 
   // comments
   const [posting, setPosting] = useState(false);
-  const { comments, addComment, fetchComments, hasMore, toggleLike } =
-    useComments(post?._id || "");
+  const {
+    comments,
+    addComment,
+    fetchComments,
+    hasMore,
+    toggleLike,
+    loadReplies,
+    addReply,
+  } = useComments(post?._id || "");
   const commentContainerRef = useRef<HTMLDivElement>(null);
+
+  //replies
+  const [replyingTo, setReplyingTo] = useState<CommentType | null>(null);
 
   useEffect(() => {
     if (post?.mediaType === "video") {
@@ -204,58 +215,97 @@ export default function PostDetail() {
             )}
 
             {comments.map((c) => (
-              <div key={c._id} className="flex justify-between">
-                <div className="flex gap-2 mt-3">
-                  <img
-                    src={getAvatar(c.userId) || "/avaauto.jpg"}
-                    className="w-6 h-6 rounded-full"
-                  />
-                  <div className="flex-1">
-                    <div className="text-sm">
-                      <span className="font-semibold mr-2">
-                        {c.userId?.username}
-                      </span>
-                      {c.content}
-                    </div>
+              <div key={c._id}>
+                {" "}
+                {/* ⭐ wrapper mới */}
+                {/* ===== COMMENT ROW ===== */}
+                <div className="flex justify-between items-start">
+                  <div className="flex gap-2 mt-3">
+                    <img
+                      src={getAvatar(c.userId) || "/avaauto.jpg"}
+                      className="w-6 h-6 rounded-full"
+                    />
 
-                    {/* line */}
-                    <div className="flex items-center gap-4 text-xs text-zinc-500 mt-1">
-                      <span>
-                        {c.createdAt ? formatTimeAgo(c.createdAt) : "Now"}
-                      </span>
-
-                      {c.likes > 0 && (
-                        <span className="font-medium">
-                          {c.likes} {c.likes === 1 ? "like" : "likes"}
+                    <div className="flex-1">
+                      <div className="text-sm">
+                        <span className="font-semibold mr-2">
+                          {c.userId?.username}
                         </span>
+                        {c.content}
+                      </div>
+
+                      <div className="flex items-center gap-4 text-xs text-zinc-500 mt-1">
+                        <span>
+                          {c.createdAt ? formatTimeAgo(c.createdAt) : "Now"}
+                        </span>
+
+                        {c.likes > 0 && (
+                          <span className="font-medium">
+                            {c.likes} {c.likes === 1 ? "like" : "likes"}
+                          </span>
+                        )}
+
+                        <button
+                          onClick={() => setReplyingTo(c)}
+                          className="hover:text-foreground"
+                        >
+                          Reply
+                        </button>
+
+                        <button className="hover:text-foreground">
+                          <MoreHorizontal size={15} />
+                        </button>
+                      </div>
+
+                      {/* view replies */}
+                      {c.replyCount > 0 && (
+                        <button
+                          onClick={() => loadReplies(c._id)}
+                          className="flex items-center gap-3 mt-2 text-xs text-zinc-400 hover:text-foreground"
+                        >
+                          <div className="w-8 h-[1px] bg-zinc-600"></div>
+
+                          {c.showReplies
+                            ? "Hide replies"
+                            : `View replies (${c.replyCount})`}
+                        </button>
                       )}
-
-                      <button className="hover:text-foreground">Reply</button>
-
-                      <button className="hover:text-foreground">
-                        <MoreHorizontal size={15}/>
-                      </button>
                     </div>
+                  </div>
+
+                  <div className="pt-3">
+                    <button
+                      onClick={() => toggleLike(c._id, c.isLiked)}
+                      className="transition transform active:scale-90"
+                    >
+                      <Heart
+                        size={14}
+                        className={`transition cursor-pointer ${
+                          c.isLiked
+                            ? "text-red-500 fill-red-500"
+                            : "text-foreground"
+                        }`}
+                      />
+                    </button>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 text-xs text-zinc-500 mt-1">
-                  <button
-                    onClick={() => toggleLike(c._id, c.isLiked)}
-                    className="transition transform active:scale-90"
-                  >
-                    <Heart
-                      size={16}
-                      className={`transition ${
-                        c.isLiked
-                          ? "text-red-500 fill-red-500"
-                          : "text-foreground"
-                      }`}
-                    />
-                  </button>
+                {c.showReplies &&
+                  c.replies?.map((reply: any) => (
+                    <div key={reply._id} className="ml-10 mt-3 flex gap-2">
+                      <img
+                        src={getAvatar(reply.userId) || "/avaauto.jpg"}
+                        className="w-6 h-6 rounded-full"
+                      />
 
-                  {c.likes > 0 && <span>{c.likes}</span>}
-                </div>
+                      <div className="text-sm">
+                        <span className="font-semibold mr-2">
+                          {reply.userId?.username}
+                        </span>
+                        {reply.content}
+                      </div>
+                    </div>
+                  ))}
               </div>
             ))}
           </div>
@@ -275,34 +325,50 @@ export default function PostDetail() {
               {post.createdAt ? formatTimeAgo(post.createdAt) : ""}
             </p>
 
-            <div className="flex gap-2">
-              <input
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder="Add a comment..."
-                className="flex-1 bg-transparent border rounded-lg px-3 py-2 text-sm"
-              />
-              <button
-                disabled={posting || !comment.trim()}
-                onClick={async () => {
-                  if (!comment.trim() || posting) return;
+            <div className="flex flex-col gap-2">
+              {replyingTo && (
+                <div className="text-xs text-zinc-400 mb-2 flex justify-between">
+                  <span>
+                    Replying to <b>@{replyingTo.userId.username}</b>
+                  </span>
 
-                  try {
-                    setPosting(true);
-                    await addComment(comment);
-                    setComment("");
-                  } finally {
-                    setPosting(false);
-                  }
-                }}
-                className={`font-semibold flex items-center gap-1 ${
-                  posting || !comment.trim()
-                    ? "text-gray-600"
-                    : "text-gray-200 hover:underline cursor-pointer"
-                }`}
-              >
-                Post
-              </button>
+                  <button onClick={() => setReplyingTo(null)}>Cancel</button>
+                </div>
+              )}
+              <div className="flex gap-3">
+                <input
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Add a comment..."
+                  className="flex-1 bg-transparent border rounded-lg px-3 py-2 text-sm"
+                />
+                <button
+                  disabled={posting || !comment.trim()}
+                  onClick={async () => {
+                    if (!comment.trim() || posting) return;
+
+                    try {
+                      setPosting(true);
+                      if (replyingTo) {
+                        await addReply(replyingTo._id, comment);
+                        setReplyingTo(null);
+                      } else {
+                        await addComment(comment);
+                      }
+                      setComment("");
+                    } finally {
+                      setPosting(false);
+                    }
+                  }}
+                  className={`font-semibold flex items-center gap-1 ${
+                    posting || !comment.trim()
+                      ? "text-gray-600"
+                      : "text-gray-200 hover:underline cursor-pointer"
+                  }`}
+                >
+                  Post
+                </button>
+              </div>
             </div>
           </div>
         </div>

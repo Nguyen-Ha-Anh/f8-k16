@@ -1,4 +1,5 @@
 import { getSuggestedUsers } from "@/api/users/userAPI";
+import FollowSuggested from "@/pages/follow/FollowSuggested";
 import type { SuggestedUser } from "@/types/rightSidebarType";
 import { getAvatar } from "@/utils/getAvatar";
 import { useEffect, useState } from "react";
@@ -24,7 +25,10 @@ export default function RightSidebar() {
 
   return (
     <div className="hidden xl:block w-[320px] px-4 pt-8">
-      <NavLink to={`/profile`} className="flex items-center justify-between mb-6">
+      <NavLink
+        to={`/profile`}
+        className="flex items-center justify-between mb-6"
+      >
         <div className="flex items-center gap-3">
           <img
             src={getAvatar(profile)}
@@ -51,10 +55,11 @@ export default function RightSidebar() {
       {/* suggested list */}
       <div className="space-y-4">
         {suggestedUsers.map((user) => (
-          <NavLink 
+          <NavLink
             to={`/profile/${user._id}`}
-            key={user._id} 
-            className="flex items-center justify-between">
+            key={user._id}
+            className="flex items-center justify-between"
+          >
             <div className="flex items-center gap-3">
               <img
                 src={getAvatar(user)}
@@ -65,10 +70,14 @@ export default function RightSidebar() {
                 <p className="text-xs text-gray-400">Suggested for you</p>
               </div>
             </div>
-            <button 
+            <button
               className="text-blue-500 text-sm font-semibold"
-              onClick={(e) => e.preventDefault()}>
-              Follow
+              onClick={(e) => e.preventDefault()}
+            >
+              <FollowSuggested
+                userId={String(user._id)}
+                initialFollowing={user.isFollowing}
+              />
             </button>
           </NavLink>
         ))}
@@ -76,7 +85,9 @@ export default function RightSidebar() {
 
       {/* footer */}
       <div className="mt-10 text-xs text-gray-500 space-y-2">
-        <p className="hover:underline">About · Help · Press · API · Jobs · Privacy · Terms</p>
+        <p className="hover:underline">
+          About · Help · Press · API · Jobs · Privacy · Terms
+        </p>
         <p>© 2026 INSTAGRAM FROM META</p>
       </div>
     </div>
