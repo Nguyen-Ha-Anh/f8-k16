@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { getAvatar } from "@/utils/getAvatar";
 import { useEffect, useState } from "react";
-import { fetchProfile, setFollowCounts } from "@/store/authSlice";
+import { setFollowCounts } from "@/store/authSlice";
 import { useNavigate } from "react-router-dom";
 import type { Post } from "@/types/posts/PostType";
 import axiosClient from "@/api/profile/axiosClient";
@@ -33,10 +33,6 @@ export default function Profile() {
   const profile = useSelector((state: any) => state.auth.profile);
 
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(fetchProfile() as any);
-  }, [dispatch]);
 
   useEffect(() => {
     if (activeTab === "saved") {

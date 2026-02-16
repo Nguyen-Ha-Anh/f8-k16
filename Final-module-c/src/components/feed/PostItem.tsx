@@ -10,12 +10,13 @@ import { formatTimeAgo } from "@/utils/formatTimeAgo";
 import { getAvatar } from "@/utils/getAvatar";
 import { MessageCircle, Repeat2, Send } from "lucide-react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function PostItem({ post }: { post: Post }) {
   const user = post.user;
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const videoRef = useAutoPlayVideo();
 
@@ -103,7 +104,15 @@ export default function PostItem({ post }: { post: Post }) {
             />
           </div>
           <div className="flex gap-1 mt-3 text-xl items-center">
-            <MessageCircle />
+            <MessageCircle
+              size={20}
+              className="cursor-pointer transition-transform hover:scale-90"
+              onClick={() =>
+                navigate(`/posts/${post._id}`, {
+                  state: { backgroundLocation: location },
+                })
+              }
+            />
             <p className="text-sm font-semibold">{post.comments || 0}</p>
           </div>
           <div className="flex gap-1 mt-3 text-xl items-center">

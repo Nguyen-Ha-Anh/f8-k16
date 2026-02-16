@@ -98,7 +98,14 @@ export default function PostDetail() {
     return () => container.removeEventListener("scroll", handleScroll);
   }, [hasMore, fetchComments]);
 
-  if (loading) return <p className="p-10">Loading post...</p>;
+  if (loading) {
+    return (
+      <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center">
+        <div className="text-white animate-pulse text-sm">Loading post...</div>
+      </div>
+    );
+  }
+
   if (error || !post) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
@@ -159,7 +166,7 @@ export default function PostDetail() {
         </div>
 
         {/* right */}
-        <div className="w-1/2 flex flex-col bg-background">
+        <div className="w-1/2 flex flex-col bg-card">
           <div className="flex items-center justify-between p-4 border-b">
             <div className="flex items-center gap-3">
               <img
@@ -217,8 +224,7 @@ export default function PostDetail() {
             {comments.map((c) => (
               <div key={c._id}>
                 {" "}
-                {/* ⭐ wrapper mới */}
-                {/* ===== COMMENT ROW ===== */}
+                {/* comment */}
                 <div className="flex justify-between items-start">
                   <div className="flex gap-2 mt-3">
                     <img
@@ -289,7 +295,6 @@ export default function PostDetail() {
                     </button>
                   </div>
                 </div>
-
                 {c.showReplies &&
                   c.replies?.map((reply: any) => (
                     <div key={reply._id} className="ml-10 mt-3 flex gap-2">

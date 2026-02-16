@@ -22,4 +22,20 @@ axiosClient.interceptors.request.use((config) => {
   return config;
 });
 
+axiosClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      console.log("Token expired → logout");
+
+      localStorage.removeItem("accessToken");
+
+      window.location.href = "/";
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+
 export default axiosClient;

@@ -36,8 +36,8 @@ export default function FollowModal({ type, userId, onClose }: FollowProps) {
   }, [type, userId]);
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-      <div className="bg-[#1c1c1c] w-[420px] rounded-2xl p-4">
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+      <div className="bg-card w-[420px] rounded-2xl p-4">
         {/* header */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="font-semibold text-lg capitalize">{type}</h2>

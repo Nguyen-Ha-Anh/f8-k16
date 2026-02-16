@@ -20,6 +20,7 @@ import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { fetchProfile } from "./store/authSlice";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import GuestRoute from "./routes/GuestRoute";
 
 export default function App() {
   const location = useLocation();
@@ -36,8 +37,23 @@ export default function App() {
   return (
     <SidebarProvider>
       <Routes location={state?.backgroundLocation || location}>
-        <Route path="/" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route
+          path="/"
+          element={
+            <GuestRoute>
+              <Login />
+            </GuestRoute>
+          }
+        />
+
+        <Route
+          path="/register"
+          element={
+            <GuestRoute>
+              <Register />
+            </GuestRoute>
+          }
+        />
         <Route path="/verify-email/:token" element={<VerifyEmail />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
