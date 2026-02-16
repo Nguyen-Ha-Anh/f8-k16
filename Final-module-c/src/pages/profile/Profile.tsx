@@ -10,10 +10,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { getAvatar } from "@/utils/getAvatar";
 import { useEffect, useState } from "react";
-import { fetchProfile } from "@/store/authSlice";
+import { fetchProfile, setFollowCounts } from "@/store/authSlice";
 import { useNavigate } from "react-router-dom";
 import type { Post } from "@/types/posts/PostType";
 import axiosClient from "@/api/profile/axiosClient";
+import { getFollowCounts } from "@/api/users/followAPI";
+import FollowModal from "@/components/follow/FollowModal";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -68,6 +70,14 @@ export default function Profile() {
   const [openFollowModal, setOpenFollowModal] = useState<
     "followers" | "following" | null
   >(null);
+
+  useEffect(() => {
+    if (!profile?._id) return;
+
+    getFollowCounts(profile._id).then((counts) => {
+      dispatch(setFollowCounts(counts));
+    });
+  }, [profile?._id]);
 
   return (
     <div className="min-h-screen bg-background text-foreground pl-[240px]">
@@ -258,6 +268,13 @@ export default function Profile() {
           </div>
         )}
       </div>
+      {openFollowModal && profile?._id && (
+        <FollowModal
+          type={openFollowModal}
+          userId={profile._id}
+          onClose={() => setOpenFollowModal(null)}
+        />
+      )}
     </div>
   );
 }

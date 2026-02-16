@@ -2,7 +2,7 @@ import { followUser, unfollowUser } from "@/api/users/followAPI";
 import { useDispatch, useSelector } from "react-redux";
 import { setFollowing } from "@/store/followSlice";
 import { useCallback, useState } from "react";
-import { fetchProfile, updateFollowingCount } from "@/store/authSlice";
+import { updateFollowingCount } from "@/store/authSlice";
 
 export function useFollowUser(
   userId: string,
@@ -38,10 +38,12 @@ export function useFollowUser(
       else await unfollowUser(userId);
 
       onSuccess?.();
-      dispatch(fetchProfile() as any);
     } catch {
       dispatch(setFollowing({ userId, value: prev }));
       onChange?.(prev);
+
+      //rollback
+      dispatch(updateFollowingCount(-delta))
     } finally {
       setLoading(false);
     }

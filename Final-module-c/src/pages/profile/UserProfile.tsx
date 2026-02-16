@@ -8,6 +8,7 @@ import { getUserPosts } from "@/api/posts/userPostsAPI";
 import { Bookmark, Clapperboard, Grid, Video } from "lucide-react";
 import { resolveMedia } from "@/utils/resolveMedia";
 import FollowButton from "../follow/FollowButton";
+import FollowModal from "@/components/follow/FollowModal";
 
 export default function UserProfile() {
   const { userId } = useParams();
@@ -19,6 +20,11 @@ export default function UserProfile() {
   const [page, setPage] = useState(0);
   const [activeTab, setActiveTab] = useState<"posts" | "video" | "saved">(
     "posts",
+  );
+
+  const [openFollowModal, setOpenFollowModal] = useState(false);
+  const [followType, setFollowType] = useState<"followers" | "following">(
+    "followers",
   );
 
   // const [followers, setFollowers] = useState<number>(0);
@@ -92,11 +98,25 @@ export default function UserProfile() {
             <span>
               <b>{user.postsCount || posts.length}</b> posts
             </span>
-            <span>
+
+            <span
+              className="cursor-pointer"
+              onClick={() => {
+                setFollowType("followers");
+                setOpenFollowModal(true);
+              }}
+            >
               <b>{user.followersCount ?? 0}</b> followers
             </span>
-            <span>
-              <b>{user.followingCount}</b> following
+
+            <span
+              className="cursor-pointer"
+              onClick={() => {
+                setFollowType("following");
+                setOpenFollowModal(true);
+              }}
+            >
+              <b>{user.followingCount ?? 0}</b> following
             </span>
           </div>
 
@@ -207,6 +227,13 @@ export default function UserProfile() {
           );
         })}
       </div>
+      {openFollowModal && (
+        <FollowModal
+          type={followType}
+          userId={user._id}
+          onClose={() => setOpenFollowModal(false)}
+        />
+      )}
     </div>
   );
 }
