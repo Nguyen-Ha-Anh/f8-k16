@@ -1,0 +1,8 @@
+model Attribute {
+  id        Int     @id @default(autoincrement())
+  name String @db.VarChar(100) @unique
+  createAt DateTime? @default(now())
+  attributeValue AttributeValue[]
+
+  @@map ("attributes")
+}
